@@ -3,6 +3,7 @@ import "./App.scss";
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from "chart.js";
 import { ChoroplethController, ColorScale, GeoFeature, ProjectionScale } from "chartjs-chart-geo";
 import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { BrowserRouter as Router } from "react-router-dom";
 
 import { UserSessionManager } from "../../../app";
@@ -28,22 +29,30 @@ ChartJS.register(
 );
 
 export function App() {
+    const { t } = useTranslation();
     const api = useApiContext();
     const dispatch = useAppDispatch();
     const loadingState = useAppSelector(selectLoadingState);
     const userRole = useAppSelector(userSlice.selectUserRole);
     const userIsFullyLoaded = useAppSelector(userSlice.selectUserIsFullyLoaded);
+    
     useEffect(() => {
         if (loadingState === "not-loaded") {
             dispatch(loadAppInfoAsync(api));
         }
     });
+    
+    useEffect(() => {
+        document.title = t("appTitle");
+    }, [t]);
+    
     const handleApiRequestError = (error: Error) => {
         if (userRole !== "unauthorized" && userIsFullyLoaded && error.message.includes("401 Unauthorized")) {
             UserSessionManager.resetUserDependantStores();
         }
     };
     api.setRequestErrorHandler(handleApiRequestError);
+    
     return (
         <Router>
             <div className="App">
