@@ -1,0 +1,28 @@
+.InvestmentForm__box {
+    margin: 30px 0;
+    padding: 20px 20px 40px 20px;
+    background: var(--box-bg);
+    border-radius: 5px;
+    position: relative;
+    
+    &:first-child {
+        margin-top: 0;
+    }
+    
+    .InvestmentForm__box__delete-button {
+        position: absolute;
+        right: 0px;
+        bottom: 0px;
+        z-index: 1;
+    }
+    
+    .InvestmentForm__box__duration {
+        display: flex;
+        align-items: center;
+        margin: 25px 0;
+        gap: 25px;
+        > .MuiFormControl-root {
+            margin-top: 0;
+        }
+    }
+}

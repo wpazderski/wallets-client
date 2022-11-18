@@ -1,0 +1,10 @@
+.PageContent {
+    a {
+        color: var(--color-theme);
+        text-decoration: none;
+        
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}

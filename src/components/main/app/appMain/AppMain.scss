@@ -1,0 +1,12 @@
+.AppMain {
+    width: calc(100% - var(--sidebar-width));
+    margin-left: var(--sidebar-width);
+    background: var(--main-bg);
+    color: var(--main-fg);
+}
+
+.AppMain__snackbar-alerts-container {
+    > .MuiAlert-root + .MuiAlert-root {
+        margin-top: 10px;
+    }
+}

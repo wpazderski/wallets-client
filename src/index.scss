@@ -1,0 +1,137 @@
+@import "@fontsource/roboto/100.css";
+@import "@fontsource/roboto/300.css";
+@import "@fontsource/roboto/400.css";
+@import "@fontsource/roboto/500.css";
+@import "@fontsource/roboto/700.css";
+@import "@fontsource/inconsolata/400.css";
+@import "@fontsource/inconsolata/700.css";
+
+:root {
+    --sidebar-width: 400px;
+    --form-width: 800px;
+    
+    --font-regular: "Roboto", sans-serif;
+    --font-monospace: "Consolas", "Inconsolata", monospace;
+    
+    --main-bg: #fff;
+    --box-bg: #f8f8f8;
+    --main-fg: #222;
+    --separator-color: #eee;
+    --extra-info-fg: #888;
+    
+    --color-theme: hsl(204deg 69% 35%);
+    --color-theme-darker: hsl(204deg 69% 30%);
+    --color-theme-lighter: hsl(204deg 69% 40%);
+    --color-theme-dark: hsl(204deg 69% 25%);
+    --color-theme-light: hsl(204deg 69% 45%);
+    
+    --theme-bg: var(--color-theme);
+    --theme-fg: #fff;
+    --theme-bg-hover: var(--color-theme-lighter);
+    --theme-fg-hover: var(--theme-fg);
+    --theme-bg-active: var(--color-theme-darker);
+    --theme-fg-active: var(--theme-fg);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-regular);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+    font-family: var(--font-monospace);
+}
+
+html,
+body,
+#root {
+    height: 100%;
+}
+
+.monospace-font {
+    font-family: var(--font-monospace);
+}
+
+.icon-l { font-size: 24px; }
+.icon-xl { font-size: 30px; }
+.icon-xxl { font-size: 36px; }
+
+.switch--readonly {
+    pointer-events: none;
+}
+
+.MuiAlert-root {
+    min-width: 50vw;
+}
+
+.MuiDataGrid-root {
+    .MuiDataGrid-main {
+        font-size: 16px;
+    }
+    .MuiDataGrid-cell:focus-within {
+        outline: none !important;
+    }
+    .MuiDataGrid-row--lastVisible > * {
+        border-bottom: 0 !important;
+    }
+    .MuiButtonBase-root {
+        min-width: 30px;
+        + .MuiButtonBase-root {
+            margin-left: 10px;
+        }
+    }
+}
+
+.date-range {
+    font-family: var(--font-monospace);
+    .date-range__separator {
+        margin: 0 10px;
+    }
+}
+
+.math-equation {
+    font-family: var(--font-monospace);
+    word-wrap: break-all;
+    .math-equation__operator {
+        margin: 0 20px;
+    }
+}
+
+table:not(.unstyled) {
+    width:100%;
+    table-layout: fixed;
+    overflow-wrap: break-word;
+    border-collapse: collapse;
+    td,
+    th {
+        padding: 10px 15px;
+        border: 1px solid var(--separator-color);
+        &.centered {
+            text-align: center;
+        }
+        &.left {
+            text-align: left;
+        }
+        &.right {
+            text-align: right;
+        }
+    }
+    thead,
+    tfoot {
+        background: var(--box-bg);
+        font-weight: bold;
+    }
+}
+
+.chart-container--small {
+    width: 300px;
+}
+.chart-container--medium {
+    max-width: 800px;
+}

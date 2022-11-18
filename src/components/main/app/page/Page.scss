@@ -1,0 +1,10 @@
+.Page {
+    padding: 30px;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    > .PageContent {
+        flex: 1 1 auto;
+    }
+}

@@ -1,0 +1,22 @@
+.Summary__view-settings {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 20px;
+    margin: 0 0 40px 0;
+}
+.Summary__tabs {
+    margin: 0 0 40px 0;
+    > .MuiTabs-scroller > .MuiTabs-flexContainer > button {
+        margin: 0 10px;
+        > svg {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+    }
+}
+.SummaryByTargetWorldAreaTab__settings {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin: 0 0 40px 0;
+}
