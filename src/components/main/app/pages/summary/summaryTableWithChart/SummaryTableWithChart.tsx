@@ -219,7 +219,7 @@ function getDefaultColumns(totalValue: number, mainCurrencyId: WalletsTypes.data
             alignHeader: "right",
             alignContent: "right",
             renderContent: entry => {
-                return (<NumberView num={entry.value / totalValue * 100} suffix={"%"} precision={2} />);
+                return (<NumberView num={totalValue === 0 ? 0 : (entry.value / totalValue * 100)} suffix={"%"} precision={2} />);
             },
         },
     ];
@@ -235,7 +235,7 @@ function getDefaultFooter(totalValue: number, tableElementTextResolver: TableEle
 
 function getDefaultChartLabelFormatter(totalValue: number, mainCurrencyId: WalletsTypes.data.currency.Id): ChartLabelFormatter {
     return (label, value) => {
-        const sharePercent = value / totalValue * 100;
+        const sharePercent = totalValue === 0 ? 0 : (value / totalValue * 100);
         const sharePercentStr = sharePercent.toFixed(2) + "%";
         const formattedValue = Utils.formatNumber({
             num: value,
