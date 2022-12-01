@@ -231,7 +231,7 @@ export function Investments() {
                             </Link>
                         }
                         {params.row.rowType === "investment" &&
-                            <Link to={getViewInvestmentUrl(investmentTypeSlug, params.row.id)}>
+                            <Link to={getViewInvestmentUrl(params.row.type, params.row.id)}>
                                 {params.value}
                             </Link>
                         }
