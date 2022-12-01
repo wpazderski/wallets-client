@@ -50,7 +50,7 @@ export function InvestmentForm() {
     const userSettings = useAppSelector(selectUserSettings);
     const existingInvestmentType = useAppSelector(selectInvestmentTypesList).find(investmentType => investmentType.slug === investmentTypeSlug);
     const investmentType = existingInvestmentType ?? getEmptyCustomInvestmentType();
-    const existingInvestment = useAppSelector(selectInvestmentsList).find(investment => investment.id === investmentId) ?? getEmptyInvestment(investmentType.id);
+    const existingInvestment = useAppSelector(selectInvestmentsList).find(investment => investment.id === investmentId) ?? getEmptyInvestment(investmentType);
     const investment = existingInvestment ?? getEmptyCustomInvestmentType();
     const [investmentName, setInvestmentName] = useState(investment.name);
     const [walletId, setWalletId] = useState(investment.walletId);
@@ -92,20 +92,6 @@ export function InvestmentForm() {
                 price: 1000,
                 weight: 1,
             });
-        }
-    }
-    if (valueCalculationMethod.type !== investmentType.valueCalculationMethod) {
-        if (investmentType.valueCalculationMethod === "manual") {
-            setValueCalculationMethod({ type: investmentType.valueCalculationMethod, currentValue: 1000 });
-        }
-        else if (investmentType.valueCalculationMethod === "interest") {
-            setValueCalculationMethod({ type: investmentType.valueCalculationMethod });
-        }
-        else if (investmentType.valueCalculationMethod === "obtainer") {
-            setValueCalculationMethod({ type: investmentType.valueCalculationMethod, ticker: "" as WalletsTypes.data.market.Ticker });
-        }
-        else if (investmentType.valueCalculationMethod === "cryptocurrency") {
-            setValueCalculationMethod({ type: investmentType.valueCalculationMethod, cryptocurrencyId: "" as WalletsTypes.data.cryptocurrency.Id });
         }
     }
     
@@ -251,7 +237,7 @@ export function InvestmentForm() {
                                     value={startDate}
                                     onChange={handleStartDateChange}
                                     createValidator={(validator, validatorName) => validators[validatorName] = validator}
-                                    required={valueCalculationMethod.type === "interest"}
+                                    required={valueCalculationMethod.type === "interest" && interestPeriods.length > 0}
                                 />
                                 {investmentType.enableEndDate && valueCalculationMethod.type !== "interest" && <InvestmentEndDateField
                                     value={endDate}

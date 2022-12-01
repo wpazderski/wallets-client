@@ -22,7 +22,7 @@ export function InvestmentValueCalculationMethodView(props: InvestmentValueCalcu
             {props.investment.valueCalculationMethod.type === "manual" && (
                 <>
                     {t("common.investments.fields.valueCalculationMethod.type.manual")}{": "}
-                    <strong>{props.investment.valueCalculationMethod.currentValue}{" "}{props.investment.purchase.currency}</strong>
+                    <NumberView num={props.investment.valueCalculationMethod.currentValue} currency={props.investment.purchase.currency} />
                 </>
             )}
             {props.investment.valueCalculationMethod.type === "interest" && (

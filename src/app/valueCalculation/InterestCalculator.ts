@@ -23,14 +23,19 @@ export class InterestCalculator {
     }
     
     calculate(): number {
+        const purchaseValue = CalculationUtils.calculateInvestmentPurchaseValue(this.investment);
         if (!this.investment.startDate) {
-            throw new Error("Missing start date");
+            if (this.investment.interestPeriods.length === 0) {
+                return purchaseValue;
+            }
+            else {
+                throw new Error("Missing start date");
+            }
         }
         this.interestPeriodsWithInterest = [];
         let time: number = this.investment.startDate;
         let interestTotal: number = 0;
         const now = Date.now();
-        const purchaseValue = CalculationUtils.calculateInvestmentPurchaseValue(this.investment);
         for (const interestPeriod of this.investment.interestPeriods) {
             for (let repeatId = 0; repeatId < interestPeriod.repeats; ++repeatId) {
                 const startTime = time;

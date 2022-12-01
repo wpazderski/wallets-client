@@ -5,7 +5,7 @@ import * as WalletsTypes from "@wpazderski/wallets-types";
 import { Api } from "../Api";
 import { Utils } from "../Utils";
 import { Duration } from "./CommonTypes";
-import { InvestmentTypeId } from "./InvestmentTypesSlice";
+import { InvestmentType, InvestmentTypeId } from "./InvestmentTypesSlice";
 import { RootState, store } from "./Store";
 import { defaultWalletId, WalletId } from "./WalletsSlice";
 
@@ -127,7 +127,7 @@ export const initialState: InvestmentsState = {
     loadingState: "not-loaded",
 };
 
-export function getEmptyInvestment(investmentTypeId: InvestmentTypeId): Investment {
+export function getEmptyInvestment(investmentType: InvestmentType): Investment {
     const state = store.getState();
     const currencies = state.userSettings.currencies;
     const mainCurrencyId = state.userSettings.mainCurrencyId;
@@ -136,7 +136,7 @@ export function getEmptyInvestment(investmentTypeId: InvestmentTypeId): Investme
         id: "" as InvestmentId,
         version: 1 as InvestmentVersion,
         name: "" as InvestmentName,
-        type: investmentTypeId,
+        type: investmentType.id,
         walletId: defaultWalletId,
         startDate: null,
         endDate: null,
@@ -145,10 +145,7 @@ export function getEmptyInvestment(investmentTypeId: InvestmentTypeId): Investme
             amountOfMoney: 1000,
             currency: currency.id,
         },
-        valueCalculationMethod: {
-            type: "manual",
-            currentValue: 1000,
-        },
+        valueCalculationMethod: getDefaultValueCalculationMethod(investmentType),
         interestPeriods: [],
         capitalization: false,
         incomeTaxApplicable: true,
@@ -161,6 +158,24 @@ export function getEmptyInvestment(investmentTypeId: InvestmentTypeId): Investme
         targetIndustries: [],
         targetWorldAreas: [],
     };
+}
+
+function getDefaultValueCalculationMethod(investmentType: InvestmentType): InvestmentValueCalculationMethod {
+    if (investmentType.valueCalculationMethod === "manual") {
+        return { type: investmentType.valueCalculationMethod, currentValue: 1000 };
+    }
+    else if (investmentType.valueCalculationMethod === "interest") {
+        return { type: investmentType.valueCalculationMethod };
+    }
+    else if (investmentType.valueCalculationMethod === "obtainer") {
+        return { type: investmentType.valueCalculationMethod, ticker: "" as WalletsTypes.data.market.Ticker };
+    }
+    else if (investmentType.valueCalculationMethod === "cryptocurrency") {
+        return { type: investmentType.valueCalculationMethod, cryptocurrencyId: "" as WalletsTypes.data.cryptocurrency.Id };
+    }
+    else {
+        return { type: investmentType.valueCalculationMethod, currentValue: 1000 };
+    }
 }
 
 export function getWeightUnits(): InvestmentWeightUnit[] {

@@ -38,7 +38,7 @@ export const loadExternalDataAsync = createAsyncThunk(
     "externalData/loadExternalData",
     async (data: { tickers: Types.data.market.Ticker[], cacheMaxLifetime: number, api: Api }) => {
         const response = await data.api.externalData.get({
-            tickers: data.tickers,
+            tickers: data.tickers.filter(ticker => !!ticker),
             cacheMaxLifetime: data.cacheMaxLifetime,
         });
         return response;

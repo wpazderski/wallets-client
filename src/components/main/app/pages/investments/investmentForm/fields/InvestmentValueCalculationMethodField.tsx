@@ -103,7 +103,6 @@ export function InvestmentValueCalculationMethodField(props: InvestmentValueCalc
                     value={valueCalculationMethod}
                     onChange={event => handleTypeChange(event.target.value as InvestmentValueCalculationMethod["type"])}
                     sx={{ width: "100%" }}
-                    disabled
                 >
                     {getAvailableValueCalculationMethods().map(method => <MenuItem key={method} value={method}>{t(`common.investments.fields.valueCalculationMethod.type.${method}`)}</MenuItem>)}
                 </Select>
