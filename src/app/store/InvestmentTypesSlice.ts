@@ -162,7 +162,7 @@ export const initialState: InvestmentTypesState = {
     loadingState: "not-loaded",
 };
 
-export const reservedInvestmentTypeSlugs = ["create"] as InvestmentTypeSlug[];
+export const reservedInvestmentTypeSlugs = ["all", "create"] as InvestmentTypeSlug[];
 
 export function createInvestmentTypeSlug(text: string): InvestmentTypeSlug {
     const slug = text

@@ -18,7 +18,7 @@ import { useAppDispatch, useAppSelector } from "../../../../../app/store";
 import { showUserMessage, UserMessageDuration } from "../../../../../app/store/AppSlice";
 import { selectExternalData } from "../../../../../app/store/ExternalDataSlice";
 import { Investment, InvestmentId, loadInvestmentsAsync, removeInvestmentAsync, selectInvestmentsList, selectInvestmentsLoadingState } from "../../../../../app/store/InvestmentsSlice";
-import { InvestmentTypeSlug, loadInvestmentTypesAsync, selectInvestmentTypesList, selectInvestmentTypesLoadingState } from "../../../../../app/store/InvestmentTypesSlice";
+import { InvestmentType, InvestmentTypeSlug, loadInvestmentTypesAsync, selectInvestmentTypesList, selectInvestmentTypesLoadingState } from "../../../../../app/store/InvestmentTypesSlice";
 import { selectUserSettings } from "../../../../../app/store/UserSettingsSlice";
 import { Calculator } from "../../../../../app/valueCalculation";
 import { DateTime } from "../../../common/dateTime/DateTime";
@@ -27,10 +27,18 @@ import { NumberView } from "../../../common/numberView/NumberView";
 import { Page } from "../../page/Page";
 import { PageContent } from "../../pageContent/PageContent";
 import { PageHeader } from "../../pageHeader/PageHeader";
+import { getViewInvestmentTypeUrl } from "../investmentTypes/InvestmentTypes";
 
-interface Row extends Investment {
+interface InvestmentRow extends Investment {
+    rowType: "investment";
     currentValue: number;
 }
+
+interface InvestmentTypeRow extends InvestmentType {
+    rowType: "investmentType";
+}
+
+type Row = InvestmentRow | InvestmentTypeRow;
 
 export function getInvestmentsListUrl(investmentTypeSlug: InvestmentTypeSlug): string {
     return `/investments/${investmentTypeSlug}`;
@@ -67,15 +75,39 @@ export function Investments() {
     const [deleteConfirmInvestmentName, setDeleteConfirmInvestmentName] = useState("");
     const [isInvestmentDeleteConfirmOpen, setIsInvestmentDeleteConfirmOpen] = useState(false);
     
-    const investmentType = investmentTypes.find(investmentType => investmentType.slug === investmentTypeSlug)!;
-    const investments = allInvestments.filter(investment => investment.type === investmentType.id);
+    const investmentType = investmentTypeSlug === "all" ? null : investmentTypes.find(investmentType => investmentType.slug === investmentTypeSlug);
+    const investments = investmentType ? allInvestments.filter(investment => investment.type === investmentType.id) : [...allInvestments];
     
     const rows: Row[] = useMemo(() => {
-        return isLoading ? [] : investments.map(investment => ({
+        const investmentRows: InvestmentRow[] = isLoading ? [] : investments.map(investment => ({
+            rowType: "investment",
             ...investment,
             currentValue: new Calculator(investment, externalData, userSettings).calculate(),
         }));
-    }, [isLoading, investments, externalData, userSettings]);
+        if (investmentTypeSlug === "all") {
+            const investmentRowsByInvestmentTypeId: { [investmentTypeId: string]: InvestmentRow[] } = {};
+            for (const investmentRow of investmentRows) {
+                if (!(investmentRow.type in investmentRowsByInvestmentTypeId)) {
+                    investmentRowsByInvestmentTypeId[investmentRow.type] = [];
+                }
+                investmentRowsByInvestmentTypeId[investmentRow.type].push(investmentRow);
+            }
+            
+            const rows: Row[] = [];
+            for (const investmentTypeId in investmentRowsByInvestmentTypeId) {
+                const investmentRowsForInvestmentType = investmentRowsByInvestmentTypeId[investmentTypeId];
+                const investmentType = investmentTypes.find(investmentType => investmentType.id === investmentTypeId)!;
+                const investmentTypeRow: InvestmentTypeRow = { rowType: "investmentType", ...investmentType };
+                rows.push(investmentTypeRow);
+                rows.push(...investmentRowsForInvestmentType);
+            }
+            
+            return rows;
+        }
+        else {
+            return investmentRows;
+        }
+    }, [isLoading, investments, investmentTypes, investmentTypeSlug, externalData, userSettings]);
     
     const handleLoadingError = useCallback((err: any) => {
         console.error(err);
@@ -131,7 +163,7 @@ export function Investments() {
     
     const handleDeleteInvestmentClick = useCallback((investmentId: InvestmentId) => {
         const investment = rows.find(investment => investment.id === investmentId);
-        if (!investment) {
+        if (!investment || ("showInSidebar" in investment)) {
             return;
         }
         setInvestmentToDelete(investment);
@@ -188,11 +220,22 @@ export function Investments() {
             field: "name",
             headerName: t("page.investments.table.name"),
             flex: 1,
+            sortable: investmentTypeSlug !== "all",
+            filterable: investmentTypeSlug !== "all",
             renderCell: params => {
                 return (
-                    <Link to={getViewInvestmentUrl(investmentTypeSlug, params.row.id)}>
-                        {params.value}
-                    </Link>
+                    <>
+                        {params.row.rowType === "investmentType" &&
+                            <Link to={getViewInvestmentTypeUrl(params.row.id)}>
+                                {params.row.isPredefined ? t(`common.investmentTypes.${params.value}` as any) : params.value}
+                            </Link>
+                        }
+                        {params.row.rowType === "investment" &&
+                            <Link to={getViewInvestmentUrl(investmentTypeSlug, params.row.id)}>
+                                {params.value}
+                            </Link>
+                        }
+                    </>
                 );
             },
         },
@@ -200,9 +243,15 @@ export function Investments() {
             field: "currentValue",
             headerName: t("page.investments.table.currentValue"),
             width: 250,
+            sortable: investmentTypeSlug !== "all",
+            filterable: investmentTypeSlug !== "all",
+            cellClassName: "Investments__cell--currentValue",
+            align: "right",
             renderCell: params => {
                 return (
-                    <NumberView num={params.value} currency={params.row.purchase.currency} />
+                    <>
+                        {params.row.rowType === "investment" && <NumberView num={params.value} currency={params.row.purchase.currency} />}
+                    </>
                 );
             },
         },
@@ -210,9 +259,13 @@ export function Investments() {
             field: "endDate",
             headerName: t("page.investments.table.endDate"),
             width: 250,
+            sortable: investmentTypeSlug !== "all",
+            filterable: investmentTypeSlug !== "all",
             renderCell: params => {
                 return (
-                    <DateTime timestamp={params.value ?? 0} showDate={true} />
+                    <>
+                        {params.row.rowType === "investment" && <DateTime timestamp={params.value ?? 0} showDate={true} />}
+                    </>
                 );
             },
         },
@@ -220,18 +273,24 @@ export function Investments() {
             field: "id",
             headerName: t("page.investments.table.actions"),
             width: 200,
+            sortable: investmentTypeSlug !== "all",
+            filterable: investmentTypeSlug !== "all",
             renderCell: params => {
                 return (
                     <>
-                        <Button variant="contained" onClick={() => handleViewInvestmentClick(params.row.id)}>
-                            <FontAwesomeIcon icon={faSolid.faEye} />
-                        </Button>
-                        <Button variant="contained" onClick={() => handleEditInvestmentClick(params.row.id)}>
-                            <FontAwesomeIcon icon={faSolid.faPen} />
-                        </Button>
-                        <Button variant="contained" color="warning" onClick={() => handleDeleteInvestmentClick(params.row.id)} disabled={params.row.isPredefined || params.row.numInvestments > 0}>
-                            <FontAwesomeIcon icon={faSolid.faTrash} />
-                        </Button>
+                        {params.row.rowType === "investment" && (
+                            <>
+                                <Button variant="contained" onClick={() => handleViewInvestmentClick(params.row.id)}>
+                                    <FontAwesomeIcon icon={faSolid.faEye} />
+                                </Button>
+                                <Button variant="contained" onClick={() => handleEditInvestmentClick(params.row.id)}>
+                                    <FontAwesomeIcon icon={faSolid.faPen} />
+                                </Button>
+                                <Button variant="contained" color="warning" onClick={() => handleDeleteInvestmentClick(params.row.id)} disabled={params.row.isPredefined || params.row.numInvestments > 0}>
+                                    <FontAwesomeIcon icon={faSolid.faTrash} />
+                                </Button>
+                            </>
+                        )}
                     </>
                 )
             },
@@ -240,10 +299,18 @@ export function Investments() {
     
     return (
         <Page className="Investments">
-            <PageHeader
-                title={investmentType.isPredefined ? t(`common.investmentTypes.${investmentType.name}` as any) : investmentType.name}
-                icon={<FontAwesomeIcon icon={investmentType.icon} />}
-            />
+            {investmentType && 
+                <PageHeader
+                    title={investmentType.isPredefined ? t(`common.investmentTypes.${investmentType.name}` as any) : investmentType.name}
+                    icon={<FontAwesomeIcon icon={investmentType.icon} />}
+                />
+            }
+            {!investmentType && 
+                <PageHeader
+                    title={t("common.investmentTypes.all")}
+                    icon={<FontAwesomeIcon icon={faSolid.faBook} />}
+                />
+            }
             <PageContent>
                 <Button
                     variant="contained"
@@ -264,10 +331,11 @@ export function Investments() {
                 <DataGrid
                     rows={rows}
                     columns={columns}
-                    pageSize={50}
-                    rowsPerPageOptions={[10, 20, 50, 100, 1000]}
+                    pageSize={investmentTypeSlug === "all" ? 100 : 50}
+                    rowsPerPageOptions={investmentTypeSlug === "all" ? [100] : [10, 20, 50, 100]}
                     disableSelectionOnClick
                     autoHeight={true}
+                    getRowClassName={params => params.row.rowType === "investmentType" ? "Investments__row--investmentType" : "Investments__row--investment"}
                 />
             </PageContent>
             <Dialog

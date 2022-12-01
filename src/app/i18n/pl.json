@@ -76,6 +76,8 @@
     "page.investmentTypes.deleteInvestmentTypeConfirm.text": "Czy chcesz usunąć typ inwestycji '{{name}}'?",
     "page.investmentTypes.deleteInvestmentTypeConfirm.result.success": "Typ inwestycji '{{name}}' został usunięty",
     
+    "page.allInvestments": "Wszystkie inwestycje",
+    
     "page.investmentType": "Typ inwestycji",
     
     "page.investmentTypeForm.create": "Tworzenie typu inwestycji",
@@ -211,6 +213,7 @@
     "common.wallets.info.emptyWallet": "Nie ma inwestycji w tym portfelu",
     "common.wallets.error.doesNotExist": "Portfel nie istnieje",
     
+    "common.investmentTypes.all": "Wszystkie inwestycje",
     "common.investmentTypes.deposits": "Depozyty",
     "common.investmentTypes.treasuryBonds": "Obligacje skarbowe",
     "common.investmentTypes.marketInvestments": "Inwestycje na rynku",

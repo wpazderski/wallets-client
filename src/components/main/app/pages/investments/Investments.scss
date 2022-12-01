@@ -4,3 +4,10 @@
         font-size: 22px;
     }
 }
+.Investments__row--investmentType {
+    font-weight: bold;
+    background: var(--box-bg);
+}
+.Investments__cell--currentValue {
+    padding-right: 20px !important;
+}

@@ -72,6 +72,7 @@ export function AppSidebar() {
                                     <li className="AppSidebar__separator"></li>
                                     <li className="AppSidebar__header">{t("sidebar.section.investments")}</li>
                                     <li><SidebarNavLink to="/investmentTypes"><FontAwesomeIcon fixedWidth={true} icon={faSolid.faFolder} /> <span>{t("page.investmentTypes")}</span></SidebarNavLink></li>
+                                    <li><SidebarNavLink to="/investments/all"><FontAwesomeIcon fixedWidth={true} icon={faSolid.faBook} /> <span>{t("page.allInvestments")}</span></SidebarNavLink></li>
                                     {investmentTypes.filter(investmentType => investmentType.showInSidebar).map(investmentType => (
                                         <li key={investmentType.id}>
                                             <SidebarNavLink to={`/investments/${investmentType.slug}`}>
