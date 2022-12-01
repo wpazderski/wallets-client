@@ -27,6 +27,7 @@ export function SummaryByWalletTab(props: SummaryByWalletTabProps) {
     const entries: Entry[] = useMemo(() => {
         return wallets.map(wallet => {
             const value = investments
+                .filter(investment => investment.walletId === wallet.id)
                 .map(investment => {
                     const value = new Calculator(investment, externalData, userSettings).calculate();
                     return CurrencyConverter.convert(value, investment.purchase.currency, userSettings.mainCurrencyId, externalData);

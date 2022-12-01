@@ -68,6 +68,7 @@ export function Wallets() {
             ...wallet,
             numInvestments: investments.filter(investment => investment.walletId === wallet.id).length,
             investmentsValue: investments
+                .filter(investment => investment.walletId === wallet.id)
                 .map(investment => {
                     const value = new Calculator(investment, externalData, userSettings).calculate();
                     return CurrencyConverter.convert(value, investment.purchase.currency, userSettings.mainCurrencyId, externalData);
