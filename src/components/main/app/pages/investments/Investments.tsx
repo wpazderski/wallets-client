@@ -154,12 +154,16 @@ export function Investments() {
     };
     
     const handleViewInvestmentClick = useCallback((investmentId: InvestmentId) => {
-        navigate(getViewInvestmentUrl(investmentTypeSlug, investmentId));
-    }, [navigate, investmentTypeSlug]);
+        const investment = allInvestments.find(investment => investment.id === investmentId)!;
+        const investmentType = investmentTypes.find(investmentType => investmentType.id === investment.type)!;
+        navigate(getViewInvestmentUrl(investmentType.slug, investmentId));
+    }, [navigate, allInvestments, investmentTypes]);
     
     const handleEditInvestmentClick = useCallback((investmentId: InvestmentId) => {
-        navigate(getEditInvestmentUrl(investmentTypeSlug, investmentId));
-    }, [navigate, investmentTypeSlug]);
+        const investment = allInvestments.find(investment => investment.id === investmentId)!;
+        const investmentType = investmentTypes.find(investmentType => investmentType.id === investment.type)!;
+        navigate(getEditInvestmentUrl(investmentType.slug, investmentId));
+    }, [navigate, allInvestments, investmentTypes]);
     
     const handleDeleteInvestmentClick = useCallback((investmentId: InvestmentId) => {
         const investment = rows.find(investment => investment.id === investmentId);
@@ -312,22 +316,26 @@ export function Investments() {
                 />
             }
             <PageContent>
-                <Button
-                    variant="contained"
-                    startIcon={<FontAwesomeIcon icon={faSolid.faPlus} />}
-                    sx={{ marginBottom: 3 }}
-                    onClick={() => handleCreateInvestmentClick()}
-                >
-                    {t("page.investments.createInvestment")}
-                </Button>
-                <Button
-                    className="Investments__refresh-button"
-                    variant="text"
-                    sx={{ marginBottom: 3, minWidth:0 }}
-                    onClick={() => handleRefreshClick()}
-                >
-                    <FontAwesomeIcon icon={faSolid.faRefresh} />
-                </Button>
+                {investmentTypeSlug !== "all" && (
+                    <>
+                        <Button
+                            variant="contained"
+                            startIcon={<FontAwesomeIcon icon={faSolid.faPlus} />}
+                            sx={{ marginBottom: 3 }}
+                            onClick={() => handleCreateInvestmentClick()}
+                        >
+                            {t("page.investments.createInvestment")}
+                        </Button>
+                        <Button
+                            className="Investments__refresh-button"
+                            variant="text"
+                            sx={{ marginBottom: 3, minWidth:0 }}
+                            onClick={() => handleRefreshClick()}
+                        >
+                            <FontAwesomeIcon icon={faSolid.faRefresh} />
+                        </Button>
+                    </>
+                )}
                 <DataGrid
                     rows={rows}
                     columns={columns}
