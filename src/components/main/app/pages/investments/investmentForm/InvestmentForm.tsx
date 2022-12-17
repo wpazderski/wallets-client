@@ -9,7 +9,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import * as KvapiTypes from "@wpazderski/kvapi-types";
-import * as WalletsTypes from "@wpazderski/wallets-types";
 
 import { resolveServerError, useApiContext, Utils } from "../../../../../../app";
 import { Duration, store, useAppDispatch, useAppSelector } from "../../../../../../app/store";
