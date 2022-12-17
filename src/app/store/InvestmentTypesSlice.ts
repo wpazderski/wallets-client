@@ -82,7 +82,7 @@ export const initialState: InvestmentTypesState = {
             id: "marketInvestments" as InvestmentTypeId,
             isPredefined: true,
             name: "marketInvestments" as InvestmentTypeName,
-            slug: "smarketInvestments" as InvestmentTypeSlug,
+            slug: "marketInvestments" as InvestmentTypeSlug,
             icon: JSON.parse(JSON.stringify(faSolid.faArrowTrendUp)),
             purchase: "decimalUnits",
             valueCalculationMethod: "obtainer",
@@ -285,6 +285,7 @@ export const investmentTypesSlice = createSlice({
         builder
             .addCase(loadInvestmentTypesAsync.fulfilled, (state, action) => {
                 state.loadingState = "loaded";
+                action.payload.investmentsTypesList.find(investmentType => investmentType.id === "marketInvestments")!.slug = "marketInvestments" as InvestmentTypeSlug;
                 state.investmentsTypesList = action.payload.investmentsTypesList;
             })
             .addCase(loadInvestmentTypesAsync.pending, state => {
