@@ -1,5 +1,5 @@
 # wallets-client
-A web application for secure management of investment information.
+A web application for secure management of investment information
 
 
 <hr />
@@ -10,7 +10,7 @@ A web application for secure management of investment information.
 
 <hr />
 
-Features
+## Features
 * wallets (groups of investments),
 * investments (deposits, bonds, market investments, real estate and more),
 * custom investment types,
