@@ -25,6 +25,9 @@ export function InvestmentEndDateField(props: InvestmentEndDateFieldProps) {
     const required = props.required;
     
     const handleFieldChange = (value: KvapiTypes.Timestamp | null) => {
+        if (typeof(value) === "number") {
+            value = value * 1000 as KvapiTypes.Timestamp;
+        }
         setValue(value);
         setTouchedField(true);
     };
@@ -62,8 +65,8 @@ export function InvestmentEndDateField(props: InvestmentEndDateFieldProps) {
         <FormField title={t("common.investments.fields.endDate")}>
             <DesktopDatePicker
                 inputFormat="DD.MM.YYYY"
-                value={value ? moment.utc(value) : null}
-                onChange={value => handleFieldChange((value?.local(true).valueOf() ?? null) as KvapiTypes.Timestamp | null)}
+                value={value ? moment.unix(value / 1000) : null}
+                onChange={value => handleFieldChange((value?.unix().valueOf() ?? null) as KvapiTypes.Timestamp | null)}
                 renderInput={(params) => <TextField {...params} error={!!fieldError} helperText={fieldError || " "} onBlur={() => handleFieldBlur()} />}
             />
         </FormField>
