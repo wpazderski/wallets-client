@@ -76,7 +76,9 @@ export function Investments() {
     const [isInvestmentDeleteConfirmOpen, setIsInvestmentDeleteConfirmOpen] = useState(false);
     
     const investmentType = investmentTypeSlug === "all" ? null : investmentTypes.find(investmentType => investmentType.slug === investmentTypeSlug);
-    const investments = investmentType ? allInvestments.filter(investment => investment.type === investmentType.id) : [...allInvestments];
+    const investments = useMemo(() => {
+        return investmentType ? allInvestments.filter(investment => investment.type === investmentType.id) : [...allInvestments];
+    }, [allInvestments, investmentType]);
     
     const rows: Row[] = useMemo(() => {
         const investmentRows: InvestmentRow[] = isLoading ? [] : investments.map(investment => ({
