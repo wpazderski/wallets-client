@@ -1,12 +1,11 @@
 import "./InvestmentDetails.scss";
 
-import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
-
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { useAppSelector, worldAreas } from "../../../../../../app/store";
 import { selectCurrencies } from "../../../../../../app/store/ExternalDataSlice";
@@ -26,6 +25,10 @@ import { InvestmentPurchaseView } from "./views/InvestmentPurchaseView";
 import { InvestmentTargetsView } from "./views/InvestmentTargetsView";
 import { InvestmentValueCalculationMethodView } from "./views/InvestmentValueCalculationMethodView";
 import { InvestmentWalletIdView } from "./views/InvestmentWalletIdView";
+
+
+
+
 
 export function InvestmentDetails() {
     const { investmentTypeSlug, investmentId } = useParams() as { investmentTypeSlug: InvestmentTypeSlug, investmentId: InvestmentId };

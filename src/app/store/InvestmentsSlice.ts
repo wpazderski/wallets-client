@@ -9,6 +9,10 @@ import { InvestmentType, InvestmentTypeId } from "./InvestmentTypesSlice";
 import { RootState, store } from "./Store";
 import { defaultWalletId, WalletId } from "./WalletsSlice";
 
+
+
+
+
 export type InvestmentId = KvapiTypes.Opaque<string, typeof __InvestmentId>; declare const __InvestmentId: unique symbol;
 export type InvestmentVersion = KvapiTypes.Opaque<number, typeof __InvestmentVersion>; declare const __InvestmentVersion: unique symbol;
 export type InvestmentName = KvapiTypes.Opaque<string, typeof __InvestmentName>; declare const __InvestmentName: unique symbol;

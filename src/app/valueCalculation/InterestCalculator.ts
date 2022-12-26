@@ -3,6 +3,10 @@ import { Investment, InvestmentInterestPeriod } from "../store/InvestmentsSlice"
 import { Utils } from "../Utils";
 import { CalculationUtils } from "./CalculationUtils";
 
+
+
+
+
 interface InterestPeriodWithInterest {
     interestPeriod: InvestmentInterestPeriod;
     interestPeriodComplete: boolean;

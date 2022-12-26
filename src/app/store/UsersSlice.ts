@@ -4,6 +4,10 @@ import * as KvapiTypes from "@wpazderski/kvapi-types";
 import { Api } from "../Api";
 import { RootState } from "./Store";
 
+
+
+
+
 export type Lang = KvapiTypes.Opaque<string, typeof __Lang>; declare const __Lang: unique symbol;
 export type ExternalDataCacheLifetime = KvapiTypes.Opaque<number, typeof __ExternalDataCacheLifetime>; declare const __ExternalDataCacheLifetime: unique symbol;
 

@@ -4,6 +4,10 @@ import * as KvapiTypes from "@wpazderski/kvapi-types";
 import { Api } from "../Api";
 import { RootState } from "./Store";
 
+
+
+
+
 export interface UserState {
     id: KvapiTypes.data.user.Id | null;
     role: KvapiTypes.data.user.Role;

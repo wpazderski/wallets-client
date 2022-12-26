@@ -10,6 +10,10 @@ import { CurrencyConverter } from "../../../../../../app/valueCalculation/Curren
 import { InvestmentEx } from "../Summary";
 import { Entry, SummaryTableWithChart } from "../summaryTableWithChart/SummaryTableWithChart";
 
+
+
+
+
 export interface SummaryByTargetIndustryTabProps {
     includedWallets: WalletId[];
     investmentsEx: InvestmentEx[];

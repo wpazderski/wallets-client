@@ -1,18 +1,21 @@
 import "./SummaryTableWithChart.scss";
 
+import * as WalletsTypes from "@wpazderski/wallets-types";
 import { Chart } from "chart.js";
 import * as ChartGeo from "chartjs-chart-geo";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Pie } from "react-chartjs-2";
 import { useTranslation } from "react-i18next";
 
-import * as WalletsTypes from "@wpazderski/wallets-types";
-
 import { ChartColors, Utils } from "../../../../../../app";
 import { WalletId } from "../../../../../../app/store/WalletsSlice";
 import { NumberView } from "../../../../common/numberView/NumberView";
 import { InvestmentEx } from "../Summary";
 import { WorldMapData } from "./WorldMapData";
+
+
+
+
 
 export type Align = "left" | "right" | "centered";
 

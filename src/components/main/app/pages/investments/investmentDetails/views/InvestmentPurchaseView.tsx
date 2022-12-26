@@ -4,6 +4,10 @@ import { Investment } from "../../../../../../../app/store/InvestmentsSlice";
 import { FormField } from "../../../../../common/formField/FormField";
 import { NumberView } from "../../../../../common/numberView/NumberView";
 
+
+
+
+
 export interface InvestmentPurchaseViewProps {
     investment: Investment;
 }

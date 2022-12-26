@@ -6,17 +6,21 @@
         margin-bottom: 20px;
     }
 }
+
 .UserSettings__Currencies {
     .MuiButtonBase-root {
         font-size: 18px;
     }
+    
     th {
         text-align: left;
         font-weight: 500;
     }
+    
     th:first-child {
         text-align: center;
     }
+    
     th,
     td {
         padding: 10px;

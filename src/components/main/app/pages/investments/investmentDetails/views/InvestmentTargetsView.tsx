@@ -5,6 +5,10 @@ import { ChartColors } from "../../../../../../../app";
 import { Investment, InvestmentTarget } from "../../../../../../../app/store/InvestmentsSlice";
 import { FormField } from "../../../../../common/formField/FormField";
 
+
+
+
+
 export interface InvestmentTargetsViewProps {
     investment: Investment;
     targets: InvestmentTarget<string>[];

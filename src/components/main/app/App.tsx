@@ -14,6 +14,10 @@ import { LoadingIndicator } from "../common/loadingIndicator/LoadingIndicator";
 import { AppMain } from "./appMain/AppMain";
 import { AppSidebar } from "./appSidebar/AppSidebar";
 
+
+
+
+
 ChartJS.register(
     ArcElement,
     CategoryScale,

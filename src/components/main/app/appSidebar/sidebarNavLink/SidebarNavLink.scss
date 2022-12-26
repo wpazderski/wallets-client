@@ -5,17 +5,21 @@
     color: var(--theme-fg);
     text-decoration: none;
     padding: 15px 25px;
+    
     &.SidebarNavLink--active {
         background: var(--main-bg);
         color: var(--theme-bg);
     }
+    
     &:not(.SidebarNavLink--active):hover {
         background: var(--theme-bg-hover);
         color: var(--theme-fg-hover);
     }
+    
     svg {
         font-size: 1.5em;
     }
+    
     span {
         margin-left: 15px;
         font-size: 1.1em;

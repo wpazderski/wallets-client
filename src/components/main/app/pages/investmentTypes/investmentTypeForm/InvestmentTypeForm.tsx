@@ -1,9 +1,5 @@
 import "./InvestmentTypeForm.scss";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
-
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Alert from "@mui/material/Alert";
@@ -15,12 +11,30 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { resolveServerError, useApiContext } from "../../../../../../app";
 import { useAppDispatch, useAppSelector } from "../../../../../../app/store";
 import { showUserMessage, UserMessageDuration } from "../../../../../../app/store/AppSlice";
 import { selectInvestmentsList } from "../../../../../../app/store/InvestmentsSlice";
-import { addInvestmentTypeAsync, createInvestmentTypeSlug, getEmptyCustomInvestmentType, getInvestmentTypePurchases, getInvestmentTypeValueCalculationMethods, InvestmentType, InvestmentTypeId, InvestmentTypeName, InvestmentTypePurchase, InvestmentTypeSlug, InvestmentTypeValueCalculationMethod, reservedInvestmentTypeSlugs, selectInvestmentTypesList, updateInvestmentTypeAsync } from "../../../../../../app/store/InvestmentTypesSlice";
+import {
+    addInvestmentTypeAsync,
+    createInvestmentTypeSlug,
+    getEmptyCustomInvestmentType,
+    getInvestmentTypePurchases,
+    getInvestmentTypeValueCalculationMethods,
+    InvestmentType,
+    InvestmentTypeId,
+    InvestmentTypeName,
+    InvestmentTypePurchase,
+    InvestmentTypeSlug,
+    InvestmentTypeValueCalculationMethod,
+    reservedInvestmentTypeSlugs,
+    selectInvestmentTypesList,
+    updateInvestmentTypeAsync,
+} from "../../../../../../app/store/InvestmentTypesSlice";
 import { FormField } from "../../../../common/formField/FormField";
 import { FormSeparator } from "../../../../common/formSeparator/FormSeparator";
 import { LoadingIndicator } from "../../../../common/loadingIndicator/LoadingIndicator";
@@ -28,6 +42,10 @@ import { Page } from "../../../page/Page";
 import { PageContent } from "../../../pageContent/PageContent";
 import { PageHeader } from "../../../pageHeader/PageHeader";
 import { getInvestmentTypesListUrl } from "../InvestmentTypes";
+
+
+
+
 
 function getAvailableIcons(): faSolid.IconLookup[] {
     const icons: faSolid.IconLookup[] = [];

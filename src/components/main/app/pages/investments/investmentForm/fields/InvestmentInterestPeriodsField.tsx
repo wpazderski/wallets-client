@@ -1,7 +1,3 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { NumericFormat } from "react-number-format";
-
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "@mui/material/Button";
@@ -13,11 +9,21 @@ import Select from "@mui/material/Select";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import * as WalletsTypes from "@wpazderski/wallets-types";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { NumericFormat } from "react-number-format";
 
 import { DurationUnit } from "../../../../../../../app/store";
-import { InvestmentInterestPeriod, InvestmentInterestPeriodCancellationPolicy } from "../../../../../../../app/store/InvestmentsSlice";
+import {
+    InvestmentInterestPeriod,
+    InvestmentInterestPeriodCancellationPolicy,
+} from "../../../../../../../app/store/InvestmentsSlice";
 import { FormField } from "../../../../../common/formField/FormField";
 import { InvestmentCancellationPolicyField } from "./InvestmentCancellationPolicyField";
+
+
+
+
 
 export interface InvestmentInterestPeriodsFieldProps {
     value: InvestmentInterestPeriod[];

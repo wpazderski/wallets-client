@@ -1,10 +1,17 @@
+import * as WalletsTypes from "@wpazderski/wallets-types";
 import { useTranslation } from "react-i18next";
 
-import * as WalletsTypes from "@wpazderski/wallets-types";
-
-import { Investment, InvestmentCancellationPolicy, InvestmentInterestPeriodCancellationPolicy } from "../../../../../../../app/store/InvestmentsSlice";
+import {
+    Investment,
+    InvestmentCancellationPolicy,
+    InvestmentInterestPeriodCancellationPolicy,
+} from "../../../../../../../app/store/InvestmentsSlice";
 import { FormField } from "../../../../../common/formField/FormField";
 import { NumberView } from "../../../../../common/numberView/NumberView";
+
+
+
+
 
 export interface InvestmentCancellationPolicyViewProps {
     investment: Investment;

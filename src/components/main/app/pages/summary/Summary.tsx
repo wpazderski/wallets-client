@@ -1,8 +1,5 @@
 import "./Summary.scss";
 
-import { useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Checkbox from "@mui/material/Checkbox";
@@ -13,6 +10,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
+import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useAppSelector } from "../../../../../app/store";
 import { selectExternalData } from "../../../../../app/store/ExternalDataSlice";
@@ -30,6 +29,10 @@ import { SummaryByTargetCurrencyTab } from "./tabs/SummaryByTargetCurrencyTab";
 import { SummaryByTargetIndustryTab } from "./tabs/SummaryByTargetIndustryTab";
 import { SummaryByTargetWorldAreaTab } from "./tabs/SummaryByTargetWorldAreaTab";
 import { SummaryByWalletTab } from "./tabs/SummaryByWalletTab";
+
+
+
+
 
 export interface InvestmentEx extends Investment {
     currentValue: number;

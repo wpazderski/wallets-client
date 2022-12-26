@@ -1,14 +1,24 @@
+import * as WalletsTypes from "@wpazderski/wallets-types";
 import { useTranslation } from "react-i18next";
 
-import * as WalletsTypes from "@wpazderski/wallets-types";
-
 import { useAppSelector } from "../../../../../../../app/store";
-import { selectCryptocurrencies, selectCryptocurrencyExchangeRates, selectExternalData } from "../../../../../../../app/store/ExternalDataSlice";
-import { Investment, InvestmentValueCalculationMethod_Cryptocurrency } from "../../../../../../../app/store/InvestmentsSlice";
+import {
+    selectCryptocurrencies,
+    selectCryptocurrencyExchangeRates,
+    selectExternalData,
+} from "../../../../../../../app/store/ExternalDataSlice";
+import {
+    Investment,
+    InvestmentValueCalculationMethod_Cryptocurrency,
+} from "../../../../../../../app/store/InvestmentsSlice";
 import { selectUserMainCurrencyId } from "../../../../../../../app/store/UserSettingsSlice";
 import { CurrencyConverter } from "../../../../../../../app/valueCalculation/CurrencyConverter";
 import { FormField } from "../../../../../common/formField/FormField";
 import { NumberView } from "../../../../../common/numberView/NumberView";
+
+
+
+
 
 export interface InvestmentValueCalculationMethodViewProps {
     investment: Investment;

@@ -1,9 +1,19 @@
 import { ExternalDataState } from "../store/ExternalDataSlice";
-import { Investment, InvestmentCancellationPolicy, InvestmentInterestPeriodCancellationPolicy, InvestmentValueCalculationMethod_Cryptocurrency, InvestmentValueCalculationMethod_Obtainer } from "../store/InvestmentsSlice";
+import {
+    Investment,
+    InvestmentCancellationPolicy,
+    InvestmentInterestPeriodCancellationPolicy,
+    InvestmentValueCalculationMethod_Cryptocurrency,
+    InvestmentValueCalculationMethod_Obtainer,
+} from "../store/InvestmentsSlice";
 import { UserSettingsState } from "../store/UserSettingsSlice";
 import { Utils } from "../Utils";
 import { CalculationUtils } from "./CalculationUtils";
 import { InterestCalculator } from "./InterestCalculator";
+
+
+
+
 
 export class Calculator {
     

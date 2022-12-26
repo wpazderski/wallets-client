@@ -1,10 +1,9 @@
 import "./AppSidebar.scss";
 
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { resolveServerError, UserSessionManager } from "../../../../app";
 import { useApiContext } from "../../../../app/ApiContext";
@@ -14,6 +13,10 @@ import { showUserMessage, UserMessageDuration } from "../../../../app/store/AppS
 import { selectInvestmentTypesList } from "../../../../app/store/InvestmentTypesSlice";
 import { LoadingIndicator } from "../../common/loadingIndicator/LoadingIndicator";
 import { SidebarNavLink } from "./sidebarNavLink/SidebarNavLink";
+
+
+
+
 
 export function AppSidebar() {
     const { t } = useTranslation();

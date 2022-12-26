@@ -1,17 +1,22 @@
 import "./UserSettings.scss";
 
-import { useCallback, useState } from "react";
-import { useTranslation } from "react-i18next";
-
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { resolveServerError } from "../../../../../app";
 import { useApiContext } from "../../../../../app/ApiContext";
 import { useAppDispatch, useAppSelector } from "../../../../../app/store";
 import { showUserMessage, UserMessageDuration } from "../../../../../app/store/AppSlice";
 import { selectLastUpdateTimestamp } from "../../../../../app/store/ExternalDataSlice";
-import { Lang as LangType, saveUserSettingsAsync, selectUserSettings, setUserSettings, UserSettingsState } from "../../../../../app/store/UserSettingsSlice";
+import {
+    Lang as LangType,
+    saveUserSettingsAsync,
+    selectUserSettings,
+    setUserSettings,
+    UserSettingsState,
+} from "../../../../../app/store/UserSettingsSlice";
 import { Form } from "../../../common/form/Form";
 import { FormSeparator } from "../../../common/formSeparator/FormSeparator";
 import { LoadingIndicator } from "../../../common/loadingIndicator/LoadingIndicator";
@@ -30,6 +35,10 @@ import { UserIncomeTaxRate } from "./fields/UserIncomeTaxRate";
 import { UserLang } from "./fields/UserLang";
 import { UserLastDataUpdate } from "./fields/UserLastDataUpdate";
 import { UserUpdateDataNow } from "./fields/UserUpdateDataNow";
+
+
+
+
 
 export interface UserSettingsMessage {
     type: "success" | "error";

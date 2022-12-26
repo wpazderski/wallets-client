@@ -1,7 +1,3 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { NumericFormat } from "react-number-format";
-
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -10,11 +6,18 @@ import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 import * as WalletsTypes from "@wpazderski/wallets-types";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { NumericFormat } from "react-number-format";
 
 import { useAppSelector } from "../../../../../../../app/store";
 import { selectCurrencies } from "../../../../../../../app/store/ExternalDataSlice";
 import { InvestmentTarget, InvestmentTargetCurrencyId } from "../../../../../../../app/store/InvestmentsSlice";
 import { FormField } from "../../../../../common/formField/FormField";
+
+
+
+
 
 export interface InvestmentTargetCurrenciesFieldProps {
     value: InvestmentTarget<InvestmentTargetCurrencyId>[];

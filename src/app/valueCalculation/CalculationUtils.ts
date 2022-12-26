@@ -1,5 +1,9 @@
 import { Investment } from "../store/InvestmentsSlice";
 
+
+
+
+
 export class CalculationUtils {
     
     static calculateInvestmentPurchaseValue(investment: Investment): number {

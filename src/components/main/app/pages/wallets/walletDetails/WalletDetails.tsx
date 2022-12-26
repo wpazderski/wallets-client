@@ -1,13 +1,12 @@
 import "./WalletDetails.scss";
 
-import { useMemo } from "react";
-import { useTranslation } from "react-i18next";
-import { Link, useNavigate, useParams } from "react-router-dom";
-
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { useAppSelector } from "../../../../../../app/store";
 import { selectExternalData } from "../../../../../../app/store/ExternalDataSlice";
@@ -21,6 +20,10 @@ import { Page } from "../../../page/Page";
 import { PageContent } from "../../../pageContent/PageContent";
 import { PageHeader } from "../../../pageHeader/PageHeader";
 import { getEditInvestmentUrl, getViewInvestmentUrl } from "../../investments/Investments";
+
+
+
+
 
 interface InvestmentEx extends Investment {
     currentValue: number;

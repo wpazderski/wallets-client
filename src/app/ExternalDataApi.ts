@@ -1,6 +1,10 @@
 import * as KvapiClient from "@wpazderski/kvapi-client";
 import * as Types from "@wpazderski/wallets-types";
 
+
+
+
+
 export class ExternalDataApi {
     
     constructor(private genericApi: KvapiClient.GenericApi) {

@@ -1,21 +1,41 @@
 import "./InvestmentForm.scss";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
-
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import * as KvapiTypes from "@wpazderski/kvapi-types";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { resolveServerError, useApiContext, Utils } from "../../../../../../app";
 import { Duration, store, useAppDispatch, useAppSelector } from "../../../../../../app/store";
 import { showUserMessage, UserMessageDuration } from "../../../../../../app/store/AppSlice";
 import { loadExternalDataAsync } from "../../../../../../app/store/ExternalDataSlice";
-import { addInvestmentAsync, getAllTickers, getEmptyInvestment, Investment, InvestmentCancellationPolicy, InvestmentId, InvestmentInterestPeriod, InvestmentName, InvestmentPurchase, InvestmentTarget, InvestmentTargetCurrencyId, InvestmentTargetIndustryId, InvestmentTargetWorldAreaId, InvestmentValueCalculationMethod, selectInvestmentsList, updateInvestmentAsync } from "../../../../../../app/store/InvestmentsSlice";
-import { getEmptyCustomInvestmentType, InvestmentTypeSlug, selectInvestmentTypesList } from "../../../../../../app/store/InvestmentTypesSlice";
+import {
+    addInvestmentAsync,
+    getAllTickers,
+    getEmptyInvestment,
+    Investment,
+    InvestmentCancellationPolicy,
+    InvestmentId,
+    InvestmentInterestPeriod,
+    InvestmentName,
+    InvestmentPurchase,
+    InvestmentTarget,
+    InvestmentTargetCurrencyId,
+    InvestmentTargetIndustryId,
+    InvestmentTargetWorldAreaId,
+    InvestmentValueCalculationMethod,
+    selectInvestmentsList,
+    updateInvestmentAsync,
+} from "../../../../../../app/store/InvestmentsSlice";
+import {
+    getEmptyCustomInvestmentType,
+    InvestmentTypeSlug,
+    selectInvestmentTypesList,
+} from "../../../../../../app/store/InvestmentTypesSlice";
 import { selectUserSettings } from "../../../../../../app/store/UserSettingsSlice";
 import { WalletId } from "../../../../../../app/store/WalletsSlice";
 import { FormField } from "../../../../common/formField/FormField";
@@ -38,6 +58,10 @@ import { InvestmentTargetIndustriesField } from "./fields/InvestmentTargetIndust
 import { InvestmentTargetWorldAreaField } from "./fields/InvestmentTargetWorldAreasField";
 import { InvestmentValueCalculationMethodField } from "./fields/InvestmentValueCalculationMethodField";
 import { InvestmentWalletIdField } from "./fields/InvestmentWalletIdField";
+
+
+
+
 
 export function InvestmentForm() {
     const { investmentTypeSlug, investmentId } = useParams() as { investmentTypeSlug: InvestmentTypeSlug, investmentId: InvestmentId };

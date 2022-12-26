@@ -58,14 +58,6 @@ body,
     font-family: var(--font-monospace);
 }
 
-.icon-l { font-size: 24px; }
-.icon-xl { font-size: 30px; }
-.icon-xxl { font-size: 36px; }
-
-.switch--readonly {
-    pointer-events: none;
-}
-
 .MuiAlert-root {
     min-width: 50vw;
 }
@@ -85,21 +77,6 @@ body,
         + .MuiButtonBase-root {
             margin-left: 10px;
         }
-    }
-}
-
-.date-range {
-    font-family: var(--font-monospace);
-    .date-range__separator {
-        margin: 0 10px;
-    }
-}
-
-.math-equation {
-    font-family: var(--font-monospace);
-    word-wrap: break-all;
-    .math-equation__operator {
-        margin: 0 20px;
     }
 }
 
@@ -129,9 +106,41 @@ table:not(.unstyled) {
     }
 }
 
+.date-range {
+    font-family: var(--font-monospace);
+    .date-range__separator {
+        margin: 0 10px;
+    }
+}
+
+.math-equation {
+    font-family: var(--font-monospace);
+    word-wrap: break-all;
+    .math-equation__operator {
+        margin: 0 20px;
+    }
+}
+
+.icon-l {
+    font-size: 24px;
+}
+
+.icon-xl {
+    font-size: 30px;
+}
+
+.icon-xxl {
+    font-size: 36px;
+}
+
+.switch--readonly {
+    pointer-events: none;
+}
+
 .chart-container--small {
     width: 300px;
 }
+
 .chart-container--medium {
     max-width: 800px;
 }

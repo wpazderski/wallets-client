@@ -1,40 +1,49 @@
 .FormField {
     display: flex;
     padding: 20px;
+    
     .FormField-info {
         flex: 0 0 calc(var(--form-width) * 0.4);
         padding-right: 20px;
         font-size: 18px;
+        
         .FormField-title {
             font-weight: 500;
             color: var(--theme-color);
         }
+        
         .FormField-description {
             font-size: 0.9em;
             color: var(--extra-info-fg);
             margin-top: 5px;
         }
     }
+    
     .FormField-input {
         flex: 0 0 calc(var(--form-width) * 0.6);
     }
+    
     &.FormField--full-width .FormField-input {
         flex: 1 1 auto;
     }
+    
     &.FormField--buttons .FormField-input {
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
+    
     textarea {
         resize: vertical;
     }
+    
     .MuiFormControl-root {
         width: 100%;
         + .MuiFormControl-root {
             margin-top: 25px;
         }
     }
+    
     .FormField {
         flex-direction: column;
         gap: 20px;

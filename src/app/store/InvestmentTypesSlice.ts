@@ -6,6 +6,10 @@ import { Api } from "../Api";
 import { Utils } from "../Utils";
 import { RootState, store } from "./Store";
 
+
+
+
+
 export type InvestmentTypeId = KvapiTypes.Opaque<string, typeof __InvestmentTypeId>; declare const __InvestmentTypeId: unique symbol;
 export type InvestmentTypeName = KvapiTypes.Opaque<string, typeof __InvestmentTypeName>; declare const __InvestmentTypeName: unique symbol;
 export type InvestmentTypeSlug = KvapiTypes.Opaque<string, typeof __InvestmentTypeSlug>; declare const __InvestmentTypeSlug: unique symbol;

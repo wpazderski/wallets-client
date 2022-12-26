@@ -1,12 +1,15 @@
+import FormControl from "@mui/material/FormControl";
+import TextField from "@mui/material/TextField";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { NumericFormat } from "react-number-format";
 
-import FormControl from "@mui/material/FormControl";
-import TextField from "@mui/material/TextField";
-
 import { IncomeTaxRate, UserSettingsState } from "../../../../../../app/store/UserSettingsSlice";
 import { FormField } from "../../../../common/formField/FormField";
+
+
+
+
 
 export interface UserIncomeTaxRateProps {
     incomeTaxRate: IncomeTaxRate;

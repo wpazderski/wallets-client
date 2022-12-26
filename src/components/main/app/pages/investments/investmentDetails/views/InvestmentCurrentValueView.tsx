@@ -9,6 +9,10 @@ import { Calculator } from "../../../../../../../app/valueCalculation";
 import { FormField } from "../../../../../common/formField/FormField";
 import { NumberView } from "../../../../../common/numberView/NumberView";
 
+
+
+
+
 export interface InvestmentCurrentValueViewProps {
     investment: Investment;
 }

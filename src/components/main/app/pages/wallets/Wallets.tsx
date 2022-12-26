@@ -1,9 +1,5 @@
 import "./Wallets.scss";
 
-import { useCallback, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
-
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "@mui/material/Button";
@@ -14,6 +10,9 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 import { resolveServerError, useApiContext } from "../../../../../app";
 import { useAppDispatch, useAppSelector } from "../../../../../app/store";
@@ -21,7 +20,16 @@ import { showUserMessage, UserMessageDuration } from "../../../../../app/store/A
 import { selectExternalData } from "../../../../../app/store/ExternalDataSlice";
 import { selectInvestmentsList } from "../../../../../app/store/InvestmentsSlice";
 import { selectUserSettings } from "../../../../../app/store/UserSettingsSlice";
-import { addWalletAsync, removeWalletAsync, selectWalletsList, updateWalletAsync, Wallet, WalletDescription, WalletId, WalletName } from "../../../../../app/store/WalletsSlice";
+import {
+    addWalletAsync,
+    removeWalletAsync,
+    selectWalletsList,
+    updateWalletAsync,
+    Wallet,
+    WalletDescription,
+    WalletId,
+    WalletName,
+} from "../../../../../app/store/WalletsSlice";
 import { Calculator } from "../../../../../app/valueCalculation";
 import { CurrencyConverter } from "../../../../../app/valueCalculation/CurrencyConverter";
 import { LoadingIndicator } from "../../../common/loadingIndicator/LoadingIndicator";
@@ -29,6 +37,10 @@ import { NumberView } from "../../../common/numberView/NumberView";
 import { Page } from "../../page/Page";
 import { PageContent } from "../../pageContent/PageContent";
 import { PageHeader } from "../../pageHeader/PageHeader";
+
+
+
+
 
 interface Row extends Wallet {
     numInvestments: number;

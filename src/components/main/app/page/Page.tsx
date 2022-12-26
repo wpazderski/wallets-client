@@ -2,6 +2,10 @@ import "./Page.scss";
 
 import React from "react";
 
+
+
+
+
 export interface PageProps extends React.PropsWithChildren {
     className: string;
 }

@@ -4,6 +4,10 @@ import * as WalletsTypes from "@wpazderski/wallets-types";
 
 import { Utils } from "../../../../app";
 
+
+
+
+
 export interface NumberViewProps {
     num: number;
     currency?: WalletsTypes.data.currency.Id | string;

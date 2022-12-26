@@ -7,6 +7,10 @@ import { selectWalletsList } from "../../../../../../../app/store/WalletsSlice";
 import { FormField } from "../../../../../common/formField/FormField";
 import { getViewWalletUrl } from "../../../wallets/Wallets";
 
+
+
+
+
 export interface InvestmentWalletIdViewProps {
     investment: Investment;
 }

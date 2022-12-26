@@ -1,6 +1,5 @@
-import { useMemo } from "react";
-
 import * as WalletsTypes from "@wpazderski/wallets-types";
+import { useMemo } from "react";
 
 import { useAppSelector } from "../../../../../../app/store";
 import { selectExternalData } from "../../../../../../app/store/ExternalDataSlice";
@@ -11,6 +10,10 @@ import { Calculator } from "../../../../../../app/valueCalculation";
 import { CurrencyConverter } from "../../../../../../app/valueCalculation/CurrencyConverter";
 import { InvestmentEx } from "../Summary";
 import { Entry, SummaryTableWithChart } from "../summaryTableWithChart/SummaryTableWithChart";
+
+
+
+
 
 export interface SummaryByTargetCurrencyTabProps {
     includedWallets: WalletId[];

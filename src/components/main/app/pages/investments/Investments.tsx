@@ -1,9 +1,5 @@
 import "./Investments.scss";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Link, useNavigate, useParams } from "react-router-dom";
-
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "@mui/material/Button";
@@ -12,13 +8,29 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { resolveServerError, useApiContext } from "../../../../../app";
 import { useAppDispatch, useAppSelector } from "../../../../../app/store";
 import { showUserMessage, UserMessageDuration } from "../../../../../app/store/AppSlice";
 import { selectExternalData } from "../../../../../app/store/ExternalDataSlice";
-import { Investment, InvestmentId, loadInvestmentsAsync, removeInvestmentAsync, selectInvestmentsList, selectInvestmentsLoadingState } from "../../../../../app/store/InvestmentsSlice";
-import { InvestmentType, InvestmentTypeSlug, loadInvestmentTypesAsync, selectInvestmentTypesList, selectInvestmentTypesLoadingState } from "../../../../../app/store/InvestmentTypesSlice";
+import {
+    Investment,
+    InvestmentId,
+    loadInvestmentsAsync,
+    removeInvestmentAsync,
+    selectInvestmentsList,
+    selectInvestmentsLoadingState,
+} from "../../../../../app/store/InvestmentsSlice";
+import {
+    InvestmentType,
+    InvestmentTypeSlug,
+    loadInvestmentTypesAsync,
+    selectInvestmentTypesList,
+    selectInvestmentTypesLoadingState,
+} from "../../../../../app/store/InvestmentTypesSlice";
 import { selectUserSettings } from "../../../../../app/store/UserSettingsSlice";
 import { Calculator } from "../../../../../app/valueCalculation";
 import { DateTime } from "../../../common/dateTime/DateTime";
@@ -28,6 +40,10 @@ import { Page } from "../../page/Page";
 import { PageContent } from "../../pageContent/PageContent";
 import { PageHeader } from "../../pageHeader/PageHeader";
 import { getViewInvestmentTypeUrl } from "../investmentTypes/InvestmentTypes";
+
+
+
+
 
 interface InvestmentRow extends Investment {
     rowType: "investment";

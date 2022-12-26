@@ -10,6 +10,10 @@ import userReducer from "./UserSlice";
 import usersReducer from "./UsersSlice";
 import walletsReducer from "./WalletsSlice";
 
+
+
+
+
 export const store = configureStore({
     reducer: {
         appInfo: appInfoReducer,

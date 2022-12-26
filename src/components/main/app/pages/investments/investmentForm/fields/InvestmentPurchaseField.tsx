@@ -1,17 +1,20 @@
-import { useCallback, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { NumericFormat } from "react-number-format";
-
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import * as WalletsTypes from "@wpazderski/wallets-types";
+import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { NumericFormat } from "react-number-format";
 
 import { getWeightUnits, InvestmentPurchase, InvestmentWeightUnit } from "../../../../../../../app/store/InvestmentsSlice";
 import { UserSettingsState } from "../../../../../../../app/store/UserSettingsSlice";
 import { FormField } from "../../../../../common/formField/FormField";
+
+
+
+
 
 export interface InvestmentPurchaseFieldProps {
     value: InvestmentPurchase;

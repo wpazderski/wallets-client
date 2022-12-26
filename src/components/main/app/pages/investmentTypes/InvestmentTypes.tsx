@@ -1,9 +1,5 @@
 import "./InvestmentTypes.scss";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router-dom";
-
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "@mui/material/Button";
@@ -12,16 +8,34 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link, useNavigate } from "react-router-dom";
 
 import { resolveServerError, useApiContext } from "../../../../../app";
 import { useAppDispatch, useAppSelector } from "../../../../../app/store";
 import { showUserMessage, UserMessageDuration } from "../../../../../app/store/AppSlice";
-import { loadInvestmentsAsync, selectInvestmentsList, selectInvestmentsLoadingState } from "../../../../../app/store/InvestmentsSlice";
-import { InvestmentType, InvestmentTypeId, loadInvestmentTypesAsync, removeInvestmentTypeAsync, selectInvestmentTypesList, selectInvestmentTypesLoadingState } from "../../../../../app/store/InvestmentTypesSlice";
+import {
+    loadInvestmentsAsync,
+    selectInvestmentsList,
+    selectInvestmentsLoadingState,
+} from "../../../../../app/store/InvestmentsSlice";
+import {
+    InvestmentType,
+    InvestmentTypeId,
+    loadInvestmentTypesAsync,
+    removeInvestmentTypeAsync,
+    selectInvestmentTypesList,
+    selectInvestmentTypesLoadingState,
+} from "../../../../../app/store/InvestmentTypesSlice";
 import { LoadingIndicator } from "../../../common/loadingIndicator/LoadingIndicator";
 import { Page } from "../../page/Page";
 import { PageContent } from "../../pageContent/PageContent";
 import { PageHeader } from "../../pageHeader/PageHeader";
+
+
+
+
 
 interface Row extends InvestmentType {
     numInvestments: number;

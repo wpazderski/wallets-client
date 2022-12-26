@@ -1,12 +1,18 @@
-import { useTranslation } from "react-i18next";
-
 import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
+import { useTranslation } from "react-i18next";
 
 import { getAvailableAutomaticDataUpdateOptions } from "../../../../../../app/store/ExternalDataSlice";
-import { ExternalDataCacheLifetime as ExternalDataCacheLifetimeType, UserSettingsState } from "../../../../../../app/store/UserSettingsSlice";
+import {
+    ExternalDataCacheLifetime as ExternalDataCacheLifetimeType,
+    UserSettingsState,
+} from "../../../../../../app/store/UserSettingsSlice";
 import { FormField } from "../../../../common/formField/FormField";
+
+
+
+
 
 export interface UserExternalDataCacheLifetimeProps {
     externalDataCacheLifetime: ExternalDataCacheLifetimeType;

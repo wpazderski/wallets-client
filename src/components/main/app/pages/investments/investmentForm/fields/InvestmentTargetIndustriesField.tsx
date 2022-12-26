@@ -1,7 +1,3 @@
-import { useCallback, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { NumericFormat } from "react-number-format";
-
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -9,10 +5,21 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
+import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { NumericFormat } from "react-number-format";
 
 import { useAppSelector } from "../../../../../../../app/store";
-import { InvestmentTarget, InvestmentTargetIndustryId, selectInvestmentTargetIndustryIds } from "../../../../../../../app/store/InvestmentsSlice";
+import {
+    InvestmentTarget,
+    InvestmentTargetIndustryId,
+    selectInvestmentTargetIndustryIds,
+} from "../../../../../../../app/store/InvestmentsSlice";
 import { FormField } from "../../../../../common/formField/FormField";
+
+
+
+
 
 export interface InvestmentTargetIndustriesFieldProps {
     value: InvestmentTarget<InvestmentTargetIndustryId>[];

@@ -1,7 +1,3 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { NumericFormat } from "react-number-format";
-
 import Autocomplete from "@mui/material/Autocomplete";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
@@ -9,12 +5,23 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import * as WalletsTypes from "@wpazderski/wallets-types";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { NumericFormat } from "react-number-format";
 
 import { useAppSelector } from "../../../../../../../app/store";
 import { selectCryptocurrencies, selectCryptocurrencyExchangeRates } from "../../../../../../../app/store/ExternalDataSlice";
-import { getInvestmentValueFromPurchase, InvestmentPurchase, InvestmentValueCalculationMethod } from "../../../../../../../app/store/InvestmentsSlice";
+import {
+    getInvestmentValueFromPurchase,
+    InvestmentPurchase,
+    InvestmentValueCalculationMethod,
+} from "../../../../../../../app/store/InvestmentsSlice";
 import { getInvestmentTypeValueCalculationMethods } from "../../../../../../../app/store/InvestmentTypesSlice";
 import { FormField } from "../../../../../common/formField/FormField";
+
+
+
+
 
 export interface InvestmentValueCalculationMethodFieldProps {
     value: InvestmentValueCalculationMethod;

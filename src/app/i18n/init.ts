@@ -6,6 +6,10 @@ import { Lang } from "../store/UserSettingsSlice";
 import enTranslation from "./en.json";
 import plTranslation from "./pl.json";
 
+
+
+
+
 export function getAvailableLangs(): Array<{ id: Lang, name: string }> {
     return [
         { id: "en" as Lang, name: enTranslation["langName"] },

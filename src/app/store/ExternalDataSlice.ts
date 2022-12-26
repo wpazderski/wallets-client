@@ -4,6 +4,10 @@ import * as Types from "@wpazderski/wallets-types";
 import { Api } from "../Api";
 import { RootState } from "./Store";
 
+
+
+
+
 export interface ExternalDataState extends Types.api.externalData.ExternalData {
     loadingState: "not-loaded" | "loading" | "loaded" | "error";
 }

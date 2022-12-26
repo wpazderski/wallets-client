@@ -1,13 +1,12 @@
 import "./InvestmentTypeDetails.scss";
 
-import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
-
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Switch from "@mui/material/Switch";
+import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { useAppSelector } from "../../../../../../app/store";
 import { InvestmentTypeId, selectInvestmentTypesList } from "../../../../../../app/store/InvestmentTypesSlice";
@@ -16,6 +15,10 @@ import { Page } from "../../../page/Page";
 import { PageContent } from "../../../pageContent/PageContent";
 import { PageHeader } from "../../../pageHeader/PageHeader";
 import { getEditInvestmentTypeUrl } from "../InvestmentTypes";
+
+
+
+
 
 export function InvestmentTypeDetails() {
     const { investmentTypeId } = useParams() as { investmentTypeId: InvestmentTypeId };

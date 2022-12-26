@@ -5,6 +5,10 @@ import { Api } from "../Api";
 import { Utils } from "../Utils";
 import { RootState, store } from "./Store";
 
+
+
+
+
 export type WalletId = KvapiTypes.Opaque<string, typeof __WalletId>; declare const __WalletId: unique symbol;
 export type WalletName = KvapiTypes.Opaque<string, typeof __WalletName>; declare const __WalletName: unique symbol;
 export type WalletDescription = KvapiTypes.Opaque<string, typeof __WalletDescription>; declare const __WalletDescription: unique symbol;

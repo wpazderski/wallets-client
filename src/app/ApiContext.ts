@@ -2,6 +2,10 @@ import { createContext, useContext } from "react";
 
 import { Api } from "./Api";
 
+
+
+
+
 export const ApiContext = createContext<Api | null>(null);
 
 export const useApiContext = () => {

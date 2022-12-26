@@ -6,6 +6,10 @@ import { Api } from "../Api";
 import { defaultAvailableAutomaticDataUpdateOption } from "./ExternalDataSlice";
 import { RootState } from "./Store";
 
+
+
+
+
 export type Lang = KvapiTypes.Opaque<string, typeof __Lang>; declare const __Lang: unique symbol;
 export type ExternalDataCacheLifetime = KvapiTypes.Opaque<number, typeof __ExternalDataCacheLifetime>; declare const __ExternalDataCacheLifetime: unique symbol;
 export type IncomeTaxRate = KvapiTypes.Opaque<number, typeof __IncomeTaxRate>; declare const __IncomeTaxRate: unique symbol;

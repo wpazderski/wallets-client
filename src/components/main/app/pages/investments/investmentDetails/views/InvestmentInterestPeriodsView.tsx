@@ -9,6 +9,10 @@ import { FormField } from "../../../../../common/formField/FormField";
 import { NumberView } from "../../../../../common/numberView/NumberView";
 import { CancellationPolicyView } from "./InvestmentCancellationPolicyView";
 
+
+
+
+
 export interface InvestmentInterestPeriodsViewProps {
     investment: Investment;
 }

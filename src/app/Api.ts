@@ -2,6 +2,10 @@ import * as kvapi from "@wpazderski/kvapi-client";
 
 import { ExternalDataApi } from "./ExternalDataApi";
 
+
+
+
+
 export class Api extends kvapi.Api {
     
     private _externalDataApi: ExternalDataApi;

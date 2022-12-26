@@ -1,15 +1,21 @@
-import { useCallback, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { NumericFormat } from "react-number-format";
-
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import * as WalletsTypes from "@wpazderski/wallets-types";
+import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { NumericFormat } from "react-number-format";
 
-import { InvestmentCancellationPolicy, InvestmentInterestPeriodCancellationPolicy } from "../../../../../../../app/store/InvestmentsSlice";
+import {
+    InvestmentCancellationPolicy,
+    InvestmentInterestPeriodCancellationPolicy,
+} from "../../../../../../../app/store/InvestmentsSlice";
 import { FormField } from "../../../../../common/formField/FormField";
+
+
+
+
 
 type CancellationPolicy = InvestmentCancellationPolicy | InvestmentInterestPeriodCancellationPolicy;
 

@@ -8,45 +8,56 @@
     width: var(--sidebar-width);
     background: var(--theme-bg);
     color: var(--theme-fg);
+    
     header {
         margin-top: 15px;
         text-align: center;
         display: flex;
         flex-direction: column;
+        
         svg {
             font-size: 50px;
             margin: 30px 0 10px 0;
         }
+        
         span {
             font-size: 20px;
             text-transform: uppercase;
             letter-spacing: 3px;
         }
     }
+    
     nav {
         overflow-y: overlay;
         min-height: 0;
+        
         &::-webkit-scrollbar {
             width: 10px;
         }
+        
         &::-webkit-scrollbar-track {
             background: var(--color-theme-dark);
             border-radius: 5px;
         }
+        
         &::-webkit-scrollbar-thumb {
             background: var(--color-theme-light);
             border-radius: 5px;
         }
+        
         &::-webkit-scrollbar-thumb:hover {
             background: #333;
         }
+        
         ul {
             margin: 40px 0 0 0;
             padding: 0;
             list-style-type: none;
+            
             .AppSidebar__separator {
                 height: 25px;
             }
+            
             .AppSidebar__header {
                 padding: 14px 0 10px 0;
                 text-align: center;

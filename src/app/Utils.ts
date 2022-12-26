@@ -2,6 +2,10 @@ import * as WalletsTypes from "@wpazderski/wallets-types";
 
 import { Duration } from "./store";
 
+
+
+
+
 export interface NumberFormatterProps {
     num: number;
     currency?: WalletsTypes.data.currency.Id | string;

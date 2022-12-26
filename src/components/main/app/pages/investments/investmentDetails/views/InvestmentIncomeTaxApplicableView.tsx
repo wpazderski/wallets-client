@@ -1,9 +1,12 @@
-import { useTranslation } from "react-i18next";
-
 import Switch from "@mui/material/Switch";
+import { useTranslation } from "react-i18next";
 
 import { Investment } from "../../../../../../../app/store/InvestmentsSlice";
 import { FormField } from "../../../../../common/formField/FormField";
+
+
+
+
 
 export interface InvestmentIncomeTaxApplicableViewProps {
     investment: Investment;

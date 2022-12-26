@@ -1,6 +1,3 @@
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "@mui/material/Button";
@@ -8,11 +5,17 @@ import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import * as WalletsTypes from "@wpazderski/wallets-types";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useAppSelector } from "../../../../../../app/store";
 import { selectCurrencies } from "../../../../../../app/store/ExternalDataSlice";
 import { UserSettingsState } from "../../../../../../app/store/UserSettingsSlice";
 import { FormField } from "../../../../common/formField/FormField";
+
+
+
+
 
 export interface UserCurrenciesProps {
     currencies: WalletsTypes.data.currency.Currency[];

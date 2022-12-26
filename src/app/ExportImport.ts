@@ -7,6 +7,10 @@ import { InvestmentTypesState, saveInvestmentTypesAsync, setInvestmentsTypes } f
 import { saveUserSettingsAsync, setUserSettings, UserSettingsState } from "./store/UserSettingsSlice";
 import { saveWalletsAsync, setWallets, WalletsState } from "./store/WalletsSlice";
 
+
+
+
+
 interface ExportedData {
     userSettings: UserSettingsState;
     wallets: WalletsState;
