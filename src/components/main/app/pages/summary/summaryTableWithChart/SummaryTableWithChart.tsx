@@ -1,17 +1,19 @@
 import "./SummaryTableWithChart.scss";
 
+import * as faSolid from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as WalletsTypes from "@wpazderski/wallets-types";
 import { Chart } from "chart.js";
 import * as ChartGeo from "chartjs-chart-geo";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pie } from "react-chartjs-2";
 import { useTranslation } from "react-i18next";
 
 import { ChartColors, Utils } from "../../../../../../app";
 import { WalletId } from "../../../../../../app/store/WalletsSlice";
+import { LoadingIndicator } from "../../../../common/loadingIndicator/LoadingIndicator";
 import { NumberView } from "../../../../common/numberView/NumberView";
 import { InvestmentEx } from "../Summary";
-import { WorldMapData } from "./WorldMapData";
 
 
 
@@ -40,6 +42,8 @@ export type TableElementTextKey = "name" | "currentValue" | "currentValueShare" 
 
 type TableElementTextResolver = (text: TableElementTextKey) => string;
 
+type WorldMapDataLoadingState = "initial" | "loading" | "loaded" | "failed";
+
 export interface TableWithChartProps {
     includedWallets: WalletId[];
     investmentsEx: InvestmentEx[];
@@ -54,6 +58,8 @@ export interface TableWithChartProps {
 export function SummaryTableWithChart(props: TableWithChartProps) {
     const { t } = useTranslation();
     const worldMapRef = useRef<HTMLCanvasElement>(null);
+    const [worldMapData, setWorldMapData] = useState<any>(null);
+    const [worldMapDataLoadingState, setWorldMapDataLoadingState] = useState<WorldMapDataLoadingState>("initial");
     
     const propsEntries = props.entries;
     const propsColumns = props.columns;
@@ -106,11 +112,27 @@ export function SummaryTableWithChart(props: TableWithChartProps) {
         };
     }, [entries]);
     
+    useEffect(() => {
+        if (props.withWorldMap && worldMapDataLoadingState === "initial") {
+            setWorldMapDataLoadingState("loading");
+            import("./WorldMapData").then(data => {
+                setWorldMapDataLoadingState("loaded");
+                setWorldMapData(data.WorldMapData);
+            })
+            .catch(e => {
+                setWorldMapDataLoadingState("failed");
+                throw e;
+            });
+        }
+    }, [props.withWorldMap, worldMapDataLoadingState]);
+    
     const countries = useMemo(() => {
-        const geo = WorldMapData as any;
-        const countries = (ChartGeo.topojson.feature(geo, geo.objects.countries) as any).features;
+        if (!worldMapData) {
+            return [];
+        }
+        const countries = (ChartGeo.topojson.feature(worldMapData, worldMapData.objects.countries) as any).features;
         return countries;
-    }, []);
+    }, [worldMapData]);
     
     useEffect(() => {
         if (!worldMapRef.current) {
@@ -149,45 +171,57 @@ export function SummaryTableWithChart(props: TableWithChartProps) {
         return () => chart.destroy();
     }, [worldMapRef, countries, entries, chartLabelFormatter]);
     
+    const isLoaded = !props.withWorldMap || worldMapDataLoadingState === "loaded";
+    
     return (
         <div className="SummaryTableWithChart">
-            <table>
-                <colgroup>
-                    {columns.map(column => <col key={column.id} style={{ width: column.width }} />)}
-                </colgroup>
-                <thead>
-                    <tr>
-                        {columns.map(column => <th key={column.id} className={column.alignHeader}>{column.header}</th>)}
-                    </tr>
-                </thead>
-                <tbody>
-                    {entries.map(entry => (
-                        <tr key={entry.id}>
-                            {columns.map(column => (
-                                <td key={column.id} className={column.alignContent}>
-                                    {column.renderContent(entry)}
-                                </td>
+            {isLoaded && (
+                <>
+                    <table>
+                        <colgroup>
+                            {columns.map(column => <col key={column.id} style={{ width: column.width }} />)}
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                {columns.map(column => <th key={column.id} className={column.alignHeader}>{column.header}</th>)}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {entries.map(entry => (
+                                <tr key={entry.id}>
+                                    {columns.map(column => (
+                                        <td key={column.id} className={column.alignContent}>
+                                            {column.renderContent(entry)}
+                                        </td>
+                                    ))}
+                                </tr>
                             ))}
-                        </tr>
-                    ))}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        {columns.map(column => (
-                            <td key={column.id} className={column.alignContent}>
-                                {column.renderContent(footer)}
-                            </td>
-                        ))}
-                    </tr>
-                </tfoot>
-            </table>
-            <div className="chart-container chart-container--medium">
-                <Pie options={chartOptions} data={chartData} />
-            </div>
-            {props.withWorldMap && (
-                <div className="chart-container chart-container--large">
-                    <canvas ref={worldMapRef}></canvas>
-                </div>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                {columns.map(column => (
+                                    <td key={column.id} className={column.alignContent}>
+                                        {column.renderContent(footer)}
+                                    </td>
+                                ))}
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <div className="chart-container chart-container--medium">
+                        <Pie options={chartOptions} data={chartData} />
+                    </div>
+                    {props.withWorldMap && (
+                        <div className="chart-container chart-container--large">
+                            <canvas ref={worldMapRef}></canvas>
+                        </div>
+                    )}
+                </>
+            )}
+            {!isLoaded && (
+                <>
+                    {worldMapDataLoadingState !== "failed" && <LoadingIndicator />}
+                    {worldMapDataLoadingState === "failed" && <div className="loading-failure-indicator"><FontAwesomeIcon icon={faSolid.faXmarkCircle} /></div>}
+                </>
             )}
         </div>
     );

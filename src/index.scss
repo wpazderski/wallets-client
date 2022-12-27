@@ -144,3 +144,10 @@ table:not(.unstyled) {
 .chart-container--medium {
     max-width: 800px;
 }
+
+.loading-failure-indicator {
+    color: #992222;
+    font-size: 50px;
+    margin: 250px 0;
+    text-align: center;
+}
