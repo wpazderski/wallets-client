@@ -1,7 +1,7 @@
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -20,23 +20,25 @@ export interface InvestmentWalletIdFieldProps {
 }
 
 export function InvestmentWalletIdField(props: InvestmentWalletIdFieldProps) {
+    const createValidator = props.createValidator;
+    const onChange = props.onChange;
+    
     const { t } = useTranslation();
     const wallets = useAppSelector(selectWalletsList);
     const [walletId, setWalletIdType] = useState(props.value);
     
-    const onChange = props.onChange;
-    
-    const handleWalletIdChange = (type: WalletId) => {
-        setWalletIdType(type);
-    };
+    const handleWalletIdChange = useCallback((event: SelectChangeEvent<WalletId>) => {
+        const value = event.target.value as WalletId;
+        setWalletIdType(value);
+    }, []);
     
     const validateField = useCallback(() => {
         return true;
     }, []);
     
     useEffect(() => {
-        props.createValidator(validateField, "walletId");
-    }, [props, validateField]);
+        createValidator(validateField, "walletId");
+    }, [createValidator, validateField]);
     
     useEffect(() => {
         onChange(walletId);
@@ -50,7 +52,7 @@ export function InvestmentWalletIdField(props: InvestmentWalletIdFieldProps) {
                     label={t("common.investments.fields.walletId")}
                     labelId="investment-walletId-type-label"
                     value={walletId}
-                    onChange={event => handleWalletIdChange(event.target.value as WalletId)}
+                    onChange={handleWalletIdChange}
                     sx={{ width: "100%" }}
                 >
                     {wallets.map(wallet => <MenuItem key={wallet.id} value={wallet.id}>{wallet.isPredefined ? t(wallet.name as any) : wallet.name}</MenuItem>)}

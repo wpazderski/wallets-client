@@ -1,7 +1,7 @@
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "@mui/material/Button";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
 import { ExportImport, useApiContext } from "../../../../../../app";
@@ -18,16 +18,18 @@ export interface UserImportProps {
 }
 
 export function UserImport(props: UserImportProps) {
+    const withProcessing = props.withProcessing;
+    
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const api = useApiContext();
     
-    const handleImportFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const handleImportFileChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
         if (!event.target.files || !event.target.files[0]) {
             return;
         }
         const importedFile = event.target.files[0];
-        props.withProcessing(async () => {
+        withProcessing(async () => {
             const text = await importedFile.text();
             const exportImport = new ExportImport();
             const success = await exportImport.import(text, dispatch, api);
@@ -44,7 +46,7 @@ export function UserImport(props: UserImportProps) {
                 };
             }
         })();
-    };
+    }, [api, dispatch, t, withProcessing]);
     
     return (
         <FormField className="UserSettings__Import" title={t("page.userSettings.form.import.name")} description={t("page.userSettings.form.import.description")}>

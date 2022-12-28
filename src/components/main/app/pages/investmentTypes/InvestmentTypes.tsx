@@ -109,7 +109,7 @@ export function InvestmentTypes() {
         }).catch(handleLoadingError);
     }, [dispatch, api, investmentTypesLoadingState, investmentsLoadingState, handleLoadingError]);
     
-    const handleRefreshClick = () => {
+    const handleRefreshClick = useCallback(() => {
         setIsRefreshing(true);
         Promise.all([
             dispatch(loadInvestmentTypesAsync(api)),
@@ -122,15 +122,15 @@ export function InvestmentTypes() {
                 }
             }
         }).catch(handleLoadingError);
-    };
+    }, [api, dispatch, handleLoadingError]);
     
     const handleViewInvestmentTypeClick = useCallback((investmentTypeId: InvestmentTypeId) => {
         navigate(getViewInvestmentTypeUrl(investmentTypeId));
     }, [navigate]);
     
-    const handleCreateInvestmentTypeClick = () => {
+    const handleCreateInvestmentTypeClick = useCallback(() => {
         navigate(getCreateInvestmentTypeUrl());
-    };
+    }, [navigate]);
     
     const handleEditInvestmentTypeClick = useCallback((investmentTypeId: InvestmentTypeId) => {
         navigate(getEditInvestmentTypeUrl(investmentTypeId));
@@ -146,7 +146,7 @@ export function InvestmentTypes() {
         setIsInvestmentTypeDeleteConfirmOpen(true);
     }, [rows]);
     
-    const handleDeleteInvestmentTypeConfirmClick = async () => {
+    const handleDeleteInvestmentTypeConfirmClick = useCallback(async () => {
         const investmentTypeId = investmentTypeToDelete!.id;
         setIsProcessing(true);
         try {
@@ -174,15 +174,17 @@ export function InvestmentTypes() {
         }
         setInvestmentTypeToDelete(null);
         setIsInvestmentTypeDeleteConfirmOpen(false);
-    };
-    const handleDeleteInvestmentTypeCancelClick = () => {
+    }, [api, dispatch, investmentTypeToDelete, t]);
+    
+    const handleDeleteInvestmentTypeCancelClick = useCallback(() => {
         setInvestmentTypeToDelete(null);
         setIsInvestmentTypeDeleteConfirmOpen(false);
-    };
-    const handleDeleteInvestmentTypeClose = () => {
+    }, []);
+    
+    const handleDeleteInvestmentTypeClose = useCallback(() => {
         setInvestmentTypeToDelete(null);
         setIsInvestmentTypeDeleteConfirmOpen(false);
-    };
+    }, []);
     
     const columns: GridColDef[] = useMemo(() => [
         {
@@ -214,21 +216,16 @@ export function InvestmentTypes() {
             field: "id",
             headerName: t("page.investmentTypes.table.actions"),
             width: 200,
-            renderCell: params => {
-                return (
-                    <>
-                        <Button variant="contained" onClick={() => handleViewInvestmentTypeClick(params.row.id)}>
-                            <FontAwesomeIcon icon={faSolid.faEye} />
-                        </Button>
-                        <Button variant="contained" onClick={() => handleEditInvestmentTypeClick(params.row.id)}>
-                            <FontAwesomeIcon icon={faSolid.faPen} />
-                        </Button>
-                        <Button variant="contained" color="warning" onClick={() => handleDeleteInvestmentTypeClick(params.row.id)} disabled={params.row.isPredefined || params.row.numInvestments > 0}>
-                            <FontAwesomeIcon icon={faSolid.faTrash} />
-                        </Button>
-                    </>
-                )
-            },
+            renderCell: params => (
+                <InvestmentTypeRowButtons
+                    investmentTypeId={params.row.id}
+                    isPredefined={params.row.isPredefined}
+                    numInvestments={params.row.numInvestments}
+                    onDeleteInvestmentTypeClick={handleDeleteInvestmentTypeClick}
+                    onEditInvestmentTypeClick={handleEditInvestmentTypeClick}
+                    onViewInvestmentTypeClick={handleViewInvestmentTypeClick}
+                />
+            ),
         },
     ], [handleDeleteInvestmentTypeClick, handleEditInvestmentTypeClick, handleViewInvestmentTypeClick, t]);
     
@@ -240,7 +237,7 @@ export function InvestmentTypes() {
                     variant="contained"
                     startIcon={<FontAwesomeIcon icon={faSolid.faFolderPlus} />}
                     sx={{ marginBottom: 3 }}
-                    onClick={() => handleCreateInvestmentTypeClick()}
+                    onClick={handleCreateInvestmentTypeClick}
                 >
                     {t("page.investmentTypes.createInvestmentType")}
                 </Button>
@@ -248,7 +245,7 @@ export function InvestmentTypes() {
                     className="InvestmentTypes__refresh-button"
                     variant="text"
                     sx={{ marginBottom: 3, minWidth:0 }}
-                    onClick={() => handleRefreshClick()}
+                    onClick={handleRefreshClick}
                 >
                     <FontAwesomeIcon icon={faSolid.faRefresh} />
                 </Button>
@@ -263,7 +260,7 @@ export function InvestmentTypes() {
             </PageContent>
             <Dialog
                 open={isInvestmentTypeDeleteConfirmOpen}
-                onClose={() => handleDeleteInvestmentTypeClose()}
+                onClose={handleDeleteInvestmentTypeClose}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
@@ -273,11 +270,52 @@ export function InvestmentTypes() {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ margin: 3 }}>
-                    <Button variant="contained" color="warning" onClick={() => handleDeleteInvestmentTypeConfirmClick()} autoFocus>{t("common.buttons.yes")}</Button>
-                    <Button onClick={() => handleDeleteInvestmentTypeCancelClick()}>{t("common.buttons.no")}</Button>
+                    <Button variant="contained" color="warning" onClick={handleDeleteInvestmentTypeConfirmClick} autoFocus>{t("common.buttons.yes")}</Button>
+                    <Button onClick={handleDeleteInvestmentTypeCancelClick}>{t("common.buttons.no")}</Button>
                 </DialogActions>
             </Dialog>
             {(isLoading || isProcessing || isRefreshing) && <LoadingIndicator />}
         </Page>
+    );
+}
+
+interface InvestmentTypeRowButtonsProps {
+    investmentTypeId: InvestmentTypeId;
+    isPredefined: boolean;
+    numInvestments: number;
+    onViewInvestmentTypeClick: (investmentTypeId: InvestmentTypeId) => void;
+    onEditInvestmentTypeClick: (investmentTypeId: InvestmentTypeId) => void;
+    onDeleteInvestmentTypeClick: (investmentTypeId: InvestmentTypeId) => void;
+}
+
+function InvestmentTypeRowButtons(props: InvestmentTypeRowButtonsProps) {
+    const onViewInvestmentTypeClick = props.onViewInvestmentTypeClick;
+    const onEditInvestmentTypeClick = props.onEditInvestmentTypeClick;
+    const onDeleteInvestmentTypeClick = props.onDeleteInvestmentTypeClick;
+    
+    const handleViewInvestmentTypeClick = useCallback(() => {
+        onViewInvestmentTypeClick(props.investmentTypeId);
+    }, [onViewInvestmentTypeClick, props.investmentTypeId]);
+    
+    const handleEditInvestmentTypeClick = useCallback(() => {
+        onEditInvestmentTypeClick(props.investmentTypeId);
+    }, [onEditInvestmentTypeClick, props.investmentTypeId]);
+    
+    const handleDeleteInvestmentTypeClick = useCallback(() => {
+        onDeleteInvestmentTypeClick(props.investmentTypeId);
+    }, [onDeleteInvestmentTypeClick, props.investmentTypeId]);
+    
+    return (
+        <div>
+            <Button variant="contained" onClick={handleViewInvestmentTypeClick}>
+                <FontAwesomeIcon icon={faSolid.faEye} />
+            </Button>
+            <Button variant="contained" onClick={handleEditInvestmentTypeClick}>
+                <FontAwesomeIcon icon={faSolid.faPen} />
+            </Button>
+            <Button variant="contained" color="warning" onClick={handleDeleteInvestmentTypeClick} disabled={props.isPredefined || props.numInvestments > 0}>
+                <FontAwesomeIcon icon={faSolid.faTrash} />
+            </Button>
+        </div>
     );
 }

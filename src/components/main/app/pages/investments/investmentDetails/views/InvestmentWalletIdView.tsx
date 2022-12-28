@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
@@ -18,7 +19,10 @@ export interface InvestmentWalletIdViewProps {
 export function InvestmentWalletIdView(props: InvestmentWalletIdViewProps) {
     const { t } = useTranslation();
     const wallets = useAppSelector(selectWalletsList);
-    const wallet = wallets.find(wallet => wallet.id === props.investment.walletId);
+    
+    const wallet = useMemo(() => {
+        return wallets.find(wallet => wallet.id === props.investment.walletId);
+    }, [props.investment.walletId, wallets]);
     
     return (
         <FormField title={t("common.investments.fields.walletId")} className="FormField--full-width">

@@ -1,4 +1,4 @@
-import TextField from "@mui/material/TextField";
+import TextField, { TextFieldProps } from "@mui/material/TextField";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import * as KvapiTypes from "@wpazderski/kvapi-types";
 import * as moment from "moment";
@@ -19,24 +19,25 @@ export interface InvestmentStartDateFieldProps {
 }
 
 export function InvestmentStartFieldDate(props: InvestmentStartDateFieldProps) {
+    const createValidator = props.createValidator;
+    const onChange = props.onChange;
+    
     const { t } = useTranslation();
     const [value, setValue] = useState(props.value);
     const [fieldError, setFieldError] = useState("");
     const [touchedField, setTouchedField] = useState(false);
     
-    const onChange = props.onChange;
-    const required = props.required;
-    
-    const handleFieldChange = (value: KvapiTypes.Timestamp | null) => {
+    const handleFieldChange = useCallback((momentValue: moment.Moment | null) => {
+        let value = (momentValue?.unix().valueOf() ?? null) as KvapiTypes.Timestamp | null;
         if (typeof(value) === "number") {
             value = value * 1000 as KvapiTypes.Timestamp;
         }
         setValue(value);
         setTouchedField(true);
-    };
+    }, []);
     
     const validateField = useCallback(() => {
-        if (required && value === null) {
+        if (props.required && value === null) {
             setFieldError(t("page.investmentForm.errors.startDateRequired"));
             return false;
         }
@@ -44,11 +45,11 @@ export function InvestmentStartFieldDate(props: InvestmentStartDateFieldProps) {
             setFieldError("");
             return true;
         }
-    }, [required, value, setFieldError, t]);
+    }, [props.required, value, setFieldError, t]);
     
-    const handleFieldBlur = () => {
+    const handleFieldBlur = useCallback(() => {
         setTouchedField(true);
-    };
+    }, []);
     
     useEffect(() => {
         if (touchedField) {
@@ -57,20 +58,24 @@ export function InvestmentStartFieldDate(props: InvestmentStartDateFieldProps) {
     }, [value, touchedField, validateField ]);
     
     useEffect(() => {
-        props.createValidator(validateField, "startDate");
-    }, [props, validateField]);
+        createValidator(validateField, "startDate");
+    }, [createValidator, validateField]);
     
     useEffect(() => {
         onChange(value);
     }, [onChange, value]);
+    
+    const renderInput = useCallback((params: TextFieldProps) => {
+        return <TextField {...params} error={!!fieldError} helperText={fieldError || " "} onBlur={handleFieldBlur} />;
+    }, [fieldError, handleFieldBlur]);
     
     return (
         <FormField title={t("common.investments.fields.startDate")}>
             <DesktopDatePicker
                 inputFormat="DD.MM.YYYY"
                 value={value ? moment.unix(value / 1000) : null}
-                onChange={value => handleFieldChange((value?.unix().valueOf() ?? null) as KvapiTypes.Timestamp | null)}
-                renderInput={(params) => <TextField {...params} error={!!fieldError} helperText={fieldError || " "} onBlur={() => handleFieldBlur()} />}
+                onChange={handleFieldChange}
+                renderInput={renderInput}
             />
         </FormField>
     );

@@ -1,4 +1,5 @@
 import * as WalletsTypes from "@wpazderski/wallets-types";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useAppSelector } from "../../../../../../../app/store";
@@ -69,15 +70,24 @@ interface CryptocurrencyValueCalculationDetailsProps {
 }
 
 function CryptocurrencyValueCalculationDetails(props: CryptocurrencyValueCalculationDetailsProps) {
+    const cryptocurrencyId = props.valueCalculationMethod.cryptocurrencyId;
+    
     const externalData = useAppSelector(selectExternalData);
     const userMainCurrencyId = useAppSelector(selectUserMainCurrencyId);
     const cryptocurrencies = useAppSelector(selectCryptocurrencies);
     const cryptocurrencyExchangeRates = useAppSelector(selectCryptocurrencyExchangeRates);
     
-    const cryptocurrencyId = props.valueCalculationMethod.cryptocurrencyId;
-    const cryptocurrencyName = cryptocurrencies.find(cc => cc.id === cryptocurrencyId)?.name ?? "";
-    const cryptocurrencyExchangeRate = cryptocurrencyExchangeRates[cryptocurrencyId] ?? 0;
-    const cryptocurrencyExchangeRateConverted = CurrencyConverter.convert(cryptocurrencyExchangeRate, "EUR" as WalletsTypes.data.currency.Id, userMainCurrencyId, externalData);
+    const cryptocurrencyName = useMemo(() => {
+        return cryptocurrencies.find(cc => cc.id === cryptocurrencyId)?.name ?? "";
+    }, [cryptocurrencies, cryptocurrencyId]);
+    
+    const cryptocurrencyExchangeRate = useMemo(() => {
+        return cryptocurrencyExchangeRates[cryptocurrencyId] ?? 0;
+    }, [cryptocurrencyExchangeRates, cryptocurrencyId]);
+    
+    const cryptocurrencyExchangeRateConverted = useMemo(() => {
+        return CurrencyConverter.convert(cryptocurrencyExchangeRate, "EUR" as WalletsTypes.data.currency.Id, userMainCurrencyId, externalData);
+    }, [cryptocurrencyExchangeRate, externalData, userMainCurrencyId]);
     
     return (
         <div className="math-equation">

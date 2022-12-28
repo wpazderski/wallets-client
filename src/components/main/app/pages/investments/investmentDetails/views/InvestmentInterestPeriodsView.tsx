@@ -25,13 +25,10 @@ interface InvestmentInterestPeriodEx extends InvestmentInterestPeriod{
 export function InvestmentInterestPeriodsView(props: InvestmentInterestPeriodsViewProps) {
     const { t } = useTranslation();
     
-    const interestPeriods = props.investment.interestPeriods;
-    const startDate = props.investment.startDate;
-    
     const investmentPeriodsEx = useMemo(() => {
         const arr: InvestmentInterestPeriodEx[] = [];
-        let timestamp: number = startDate!;
-        for (const interestPeriod of interestPeriods) {
+        let timestamp: number = props.investment.startDate!;
+        for (const interestPeriod of props.investment.interestPeriods) {
             for (let i = 0; i < interestPeriod.repeats; ++i) {
                 const endTimestamp = Utils.addDuration(timestamp, interestPeriod.duration);
                 arr.push({
@@ -44,7 +41,7 @@ export function InvestmentInterestPeriodsView(props: InvestmentInterestPeriodsVi
             }
         }
         return arr;
-    }, [interestPeriods, startDate]);
+    }, [props.investment.interestPeriods, props.investment.startDate]);
     
     return (
         <FormField title={t("common.investments.fields.interestPeriods")} className="FormField--full-width">

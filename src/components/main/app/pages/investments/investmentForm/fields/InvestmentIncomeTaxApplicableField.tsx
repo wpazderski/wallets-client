@@ -16,15 +16,15 @@ export interface InvestmentIncomeTaxApplicableFieldProps {
 }
 
 export function InvestmentIncomeTaxApplicableField(props: InvestmentIncomeTaxApplicableFieldProps) {
-    const { t } = useTranslation();
-    const [value, setValue] = useState(props.value);
-    
     const createValidator = props.createValidator;
     const onChange = props.onChange;
     
-    const handleFieldChange = (value: boolean) => {
-        setValue(value);
-    };
+    const { t } = useTranslation();
+    const [value, setValue] = useState(props.value);
+    
+    const handleFieldChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setValue(event.target.checked);
+    }, []);
     
     const validateField = useCallback(() => {
         return true;
@@ -43,7 +43,7 @@ export function InvestmentIncomeTaxApplicableField(props: InvestmentIncomeTaxApp
             <FormControl>
                 <Switch
                     checked={value}
-                    onChange={event => handleFieldChange(event.target.checked)}
+                    onChange={handleFieldChange}
                 />
             </FormControl>
         </FormField>

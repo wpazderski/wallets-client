@@ -17,12 +17,11 @@ export interface InvestmentTargetsViewProps {
 }
 
 export function InvestmentTargetsView(props: InvestmentTargetsViewProps) {
-    const propsTargets = props.targets;
     const labelFormatter = props.labelFormatter;
     
     const targets = useMemo(() => {
-        return [ ...propsTargets ].sort((a, b) => b.percentage - a.percentage);
-    }, [propsTargets]);
+        return [ ...props.targets ].sort((a, b) => b.percentage - a.percentage);
+    }, [props.targets]);
     
     const chartOptions = useMemo(() => ({
         plugins: {

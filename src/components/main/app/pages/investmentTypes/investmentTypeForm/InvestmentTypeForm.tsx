@@ -2,6 +2,7 @@ import "./InvestmentTypeForm.scss";
 
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { AutocompleteRenderInputParams, SelectChangeEvent } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Autocomplete from "@mui/material/Autocomplete";
 import Box from "@mui/material/Box";
@@ -118,11 +119,17 @@ export function InvestmentTypeForm() {
         }
     }, [investmentType.icon, availableIconsLoadingState]);
     
-    const handleNameChange = (theName: InvestmentTypeName) => {
-        setInvestmentTypeName(theName);
-        setSlug(createInvestmentTypeSlug(theName));
+    const goToInvestmentTypesList = useCallback(() => {
+        navigate(getInvestmentTypesListUrl());
+    }, [navigate]);
+    
+    const handleNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value as InvestmentTypeName;
+        setInvestmentTypeName(value);
+        setSlug(createInvestmentTypeSlug(value));
         setTouchedNameField(true);
-    };
+    }, []);
+    
     const validateName = useCallback(() => {
         if (investmentTypeName.length === 0) {
             setNameError(t("page.investmentTypeForm.errors.nameRequired"));
@@ -133,22 +140,26 @@ export function InvestmentTypeForm() {
             return true;
         }
     }, [investmentTypeName, setNameError, t]);
+    
     useEffect(() => {
         if (touchedNameField) {
             validateName();
         }
     }, [validateName, touchedNameField]);
-    const handleNameBlur = (theName: InvestmentTypeName) => {
-        theName = theName.trim() as InvestmentTypeName;
-        setInvestmentTypeName(theName);
-        setSlug(createInvestmentTypeSlug(theName));
-        setTouchedNameField(true);
-    };
     
-    const handleSlugChange = (slug: InvestmentTypeSlug) => {
-        setSlug(slug);
+    const handleNameBlur = useCallback((event: React.FocusEvent<HTMLInputElement>) => {
+        const value = event.target.value.trim() as InvestmentTypeName;
+        setInvestmentTypeName(value);
+        setSlug(createInvestmentTypeSlug(value));
+        setTouchedNameField(true);
+    }, []);
+    
+    const handleSlugChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value as InvestmentTypeSlug;
+        setSlug(value);
         setTouchedSlugField(true);
-    };
+    }, []);
+    
     const validateSlug = useCallback(() => {
         if (slug.length === 0) {
             setSlugError(t("page.investmentTypeForm.errors.slugRequired"));
@@ -167,63 +178,115 @@ export function InvestmentTypeForm() {
             return true;
         }
     }, [slug, setSlugError, t, investmentTypes, existingInvestmentType]);
+    
     useEffect(() => {
         if (touchedSlugField) {
             validateSlug();
         }
     }, [validateSlug, touchedSlugField]);
-    const handleSlugBlur = (slug: InvestmentTypeSlug) => {
-        setSlug(createInvestmentTypeSlug(slug));
+    
+    const handleSlugBlur = useCallback((event: React.FocusEvent<HTMLInputElement>) => {
+        setSlug(createInvestmentTypeSlug(event.target.value as InvestmentTypeSlug));
         setTouchedNameField(true);
-    };
+    }, []);
     
-    const handleIconChange = (icon: faSolid.IconLookup) => {
-        setIcon(icon);
-    };
+    const handleIconChange = useCallback((_event: React.SyntheticEvent, icon: faSolid.IconLookup | null) => {
+        setIcon(icon ?? faSolid.faMoneyBill);
+    }, []);
     
-    const handlePurchaseChange = (purchase: InvestmentTypePurchase) => {
-        setPurchase(purchase);
-    };
+    const getIconOptionLabel = useCallback((option: faSolid.IconLookup) => {
+        return option.iconName;
+    }, []);
     
-    const handleCalculationMethodChange = (valueCalculationMethod: InvestmentTypeValueCalculationMethod) => {
+    const renderIconOption = useCallback((props: React.HTMLAttributes<HTMLLIElement>, option: faSolid.IconLookup) => {
+        return (
+            <Box component="li" {...props} key={option.prefix + "-" + option.iconName}>
+                <FontAwesomeIcon icon={option} fixedWidth={true} className="InvestmentTypeForm__icon-select__icon" />
+                {option.iconName}
+            </Box>
+        );
+    }, []);
+    
+    const renderIconInput = useCallback((params: AutocompleteRenderInputParams) => {
+        return (
+            <div className="InvestmentTypeForm__icon-select__selected-value">
+                <FontAwesomeIcon icon={icon ?? faSolid.faMoneyBill} fixedWidth={true} className="InvestmentTypeForm__icon-select__icon" />
+                <TextField
+                    {...params}
+                    inputProps={{
+                        ...params.inputProps,
+                        autoComplete: "new-password",
+                    }}
+                />
+            </div>
+        );
+    }, [icon]);
+    
+    const handlePurchaseChange = useCallback((event: SelectChangeEvent<InvestmentTypePurchase>) => {
+        setPurchase(event.target.value as InvestmentTypePurchase);
+    }, []);
+    
+    const handleCalculationMethodChange = useCallback((event: SelectChangeEvent<InvestmentTypeValueCalculationMethod>) => {
+        const valueCalculationMethod = event.target.value as InvestmentTypeValueCalculationMethod;
         setValueCalculationMethod(valueCalculationMethod);
         if (valueCalculationMethod === "interest" && !enableInterest) {
             setEnableInterest(true);
         }
-    };
+    }, [enableInterest]);
     
-    const handleEnableInterestChange = (enableInterest: boolean) => {
+    const handleEnableInterestChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        const enableInterest = event.target.checked;
         setEnableInterest(enableInterest);
         if (!enableInterest && valueCalculationMethod === "interest") {
             setValueCalculationMethod("manual");
         }
-    };
+    }, [valueCalculationMethod]);
     
-    const handleEnableEndDateChange = (enableEndDate: boolean) => {
-        setEnableEndDate(enableEndDate);
-    };
+    const handleEnableEndDateChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setEnableEndDate(event.target.checked);
+    }, []);
     
-    const handleEnableCancellationPolicyChange = (enableCancellationPolicy: boolean) => {
-        setEnableCancellationPolicy(enableCancellationPolicy);
-    };
+    const handleEnableCancellationPolicyChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setEnableCancellationPolicy(event.target.checked);
+    }, []);
     
-    const handleEnableCurrenciesChange = (enableCurrencies: boolean) => {
-        setEnableCurrencies(enableCurrencies);
-    };
+    const handleEnableCurrenciesChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setEnableCurrencies(event.target.checked);
+    }, []);
     
-    const handleEnableIndustriesChange = (enableIndustries: boolean) => {
-        setEnableIndustries(enableIndustries);
-    };
+    const handleEnableIndustriesChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setEnableIndustries(event.target.checked);
+    }, []);
     
-    const handleEnableWorldAreasChange = (enableWorldAreas: boolean) => {
-        setEnableWorldAreas(enableWorldAreas);
-    };
+    const handleEnableWorldAreasChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setEnableWorldAreas(event.target.checked);
+    }, []);
     
-    const handleShowInSidebarChange = (showInSidebar: boolean) => {
-        setShowInSidebar(showInSidebar);
-    };
+    const handleShowInSidebarChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setShowInSidebar(event.target.checked);
+    }, []);
     
-    const handleSaveClick = async () => {
+    const validateConsistency = useCallback(() => {
+        if (purchase === "anyAmountOfMoney" && valueCalculationMethod === "obtainer") {
+            dispatch(showUserMessage({
+                type: "error",
+                message: t("page.investmentTypeForm.result.error.purchaseVsValueCalculationMethod"),
+                duration: UserMessageDuration.ERROR,
+            }));
+            return false;
+        }
+        return true;
+    }, [dispatch, purchase, t, valueCalculationMethod]);
+    
+    const validateForm = useCallback(() => {
+        let isOk: boolean = true;
+        isOk = validateName() && isOk;
+        isOk = validateSlug() && isOk;
+        isOk = validateConsistency() && isOk;
+        return isOk;
+    }, [validateConsistency, validateName, validateSlug]);
+    
+    const handleSaveClick = useCallback(async () => {
         if (!validateForm()) {
             return;
         }
@@ -268,31 +331,7 @@ export function InvestmentTypeForm() {
         finally {
             setIsProcessing(false);
         }
-    };
-    
-    const validateConsistency = () => {
-        if (purchase === "anyAmountOfMoney" && valueCalculationMethod === "obtainer") {
-            dispatch(showUserMessage({
-                type: "error",
-                message: t("page.investmentTypeForm.result.error.purchaseVsValueCalculationMethod"),
-                duration: UserMessageDuration.ERROR,
-            }));
-            return false;
-        }
-        return true;
-    };
-    
-    const validateForm = () => {
-        let isOk: boolean = true;
-        isOk = validateName() && isOk;
-        isOk = validateSlug() && isOk;
-        isOk = validateConsistency() && isOk;
-        return isOk;
-    };
-    
-    const goToInvestmentTypesList = () => {
-        navigate(getInvestmentTypesListUrl());
-    };
+    }, [api, dispatch, enableCancellationPolicy, enableCurrencies, enableEndDate, enableIndustries, enableInterest, enableWorldAreas, goToInvestmentTypesList, icon, investmentType, investmentTypeName, isNewInvestmentType, purchase, showInSidebar, slug, t, validateForm, valueCalculationMethod]);
     
     const isLoaded = availableIconsLoadingState === "loaded";
     
@@ -311,8 +350,8 @@ export function InvestmentTypeForm() {
                                     {canChangeParams &&
                                         <TextField
                                             value={investmentTypeName}
-                                            onChange={e => handleNameChange(e.target.value as InvestmentTypeName)}
-                                            onBlur={e => handleNameBlur(e.target.value as InvestmentTypeName)}
+                                            onChange={handleNameChange}
+                                            onBlur={handleNameBlur}
                                             error={!!nameError}
                                             helperText={nameError || " "}
                                         />
@@ -323,8 +362,8 @@ export function InvestmentTypeForm() {
                                     {canChangeParams &&
                                         <TextField
                                             value={slug}
-                                            onChange={e => handleSlugChange(e.target.value as InvestmentTypeSlug)}
-                                            onBlur={e => handleSlugBlur(e.target.value as InvestmentTypeSlug)}
+                                            onChange={handleSlugChange}
+                                            onBlur={handleSlugBlur}
                                             error={!!slugError}
                                             helperText={slugError || " "}
                                         />
@@ -338,27 +377,11 @@ export function InvestmentTypeForm() {
                                                 sx={{ width: 300 }}
                                                 options={availableIcons ?? []}
                                                 value={icon}
-                                                onChange={(_, icon) => handleIconChange(icon ?? faSolid.faMoneyBill)}
+                                                onChange={handleIconChange}
                                                 autoHighlight
-                                                getOptionLabel={option => option.iconName}
-                                                renderOption={(props, option) => (
-                                                    <Box component="li" {...props} key={option.prefix + "-" + option.iconName}>
-                                                        <FontAwesomeIcon icon={option} fixedWidth={true} className="InvestmentTypeForm__icon-select__icon" />
-                                                        {option.iconName}
-                                                    </Box>
-                                                )}
-                                                renderInput={params => (
-                                                    <div className="InvestmentTypeForm__icon-select__selected-value">
-                                                        <FontAwesomeIcon icon={icon ?? faSolid.faMoneyBill} fixedWidth={true} className="InvestmentTypeForm__icon-select__icon" />
-                                                        <TextField
-                                                            {...params}
-                                                            inputProps={{
-                                                                ...params.inputProps,
-                                                                autoComplete: "new-password",
-                                                            }}
-                                                        />
-                                                    </div>
-                                                )}
+                                                getOptionLabel={getIconOptionLabel}
+                                                renderOption={renderIconOption}
+                                                renderInput={renderIconInput}
                                             />
                                         </FormControl>
                                     }
@@ -369,7 +392,7 @@ export function InvestmentTypeForm() {
                                         <FormControl>
                                             <Select
                                                 value={purchase}
-                                                onChange={event => handlePurchaseChange(event.target.value as InvestmentTypePurchase)}
+                                                onChange={handlePurchaseChange}
                                             >
                                                 {getInvestmentTypePurchases().map(purchase =>
                                                     <MenuItem key={purchase} value={purchase}>{t(`common.investmentTypes.fields.purchase.${purchase}`)}</MenuItem>
@@ -384,7 +407,7 @@ export function InvestmentTypeForm() {
                                         <FormControl>
                                             <Select
                                                 value={valueCalculationMethod}
-                                                onChange={event => handleCalculationMethodChange(event.target.value as InvestmentTypeValueCalculationMethod)}
+                                                onChange={handleCalculationMethodChange}
                                             >
                                                 {getInvestmentTypeValueCalculationMethods().map(valueCalculationMethod =>
                                                     <MenuItem key={valueCalculationMethod} value={valueCalculationMethod}>{t(`common.investmentTypes.fields.valueCalculationMethod.${valueCalculationMethod}`)}</MenuItem>
@@ -395,35 +418,35 @@ export function InvestmentTypeForm() {
                                     {!canChangeParams && (t(`common.investmentTypes.fields.valueCalculationMethod.${valueCalculationMethod}`))}
                                 </FormField>
                                 <FormField title={t("common.investmentTypes.fields.enableInterest")}>
-                                    {canChangeParams && <Switch checked={enableInterest} onChange={event => handleEnableInterestChange(event.target.checked)} />}
+                                    {canChangeParams && <Switch checked={enableInterest} onChange={handleEnableInterestChange} />}
                                     {!canChangeParams && <Switch checked={enableInterest} disabled className="switch--readonly" />}
                                 </FormField>
                                 <FormField title={t("common.investmentTypes.fields.enableEndDate")}>
-                                    {canChangeParams && <Switch checked={enableEndDate} onChange={event => handleEnableEndDateChange(event.target.checked)} />}
+                                    {canChangeParams && <Switch checked={enableEndDate} onChange={handleEnableEndDateChange} />}
                                     {!canChangeParams && <Switch checked={enableEndDate} disabled className="switch--readonly" />}
                                 </FormField>
                                 <FormField title={t("common.investmentTypes.fields.enableCancellationPolicy")}>
-                                    {canChangeParams && <Switch checked={enableCancellationPolicy} onChange={event => handleEnableCancellationPolicyChange(event.target.checked)} />}
+                                    {canChangeParams && <Switch checked={enableCancellationPolicy} onChange={handleEnableCancellationPolicyChange} />}
                                     {!canChangeParams && <Switch checked={enableCancellationPolicy} disabled className="switch--readonly" />}
                                 </FormField>
                                 <FormField title={t("common.investmentTypes.fields.enableCurrencies")}>
-                                    {canChangeParams && <Switch checked={enableCurrencies} onChange={event => handleEnableCurrenciesChange(event.target.checked)} />}
+                                    {canChangeParams && <Switch checked={enableCurrencies} onChange={handleEnableCurrenciesChange} />}
                                     {!canChangeParams && <Switch checked={enableCurrencies} disabled className="switch--readonly" />}
                                 </FormField>
                                 <FormField title={t("common.investmentTypes.fields.enableIndustries")}>
-                                    {canChangeParams && <Switch checked={enableIndustries} onChange={event => handleEnableIndustriesChange(event.target.checked)} />}
+                                    {canChangeParams && <Switch checked={enableIndustries} onChange={handleEnableIndustriesChange} />}
                                     {!canChangeParams && <Switch checked={enableIndustries} disabled className="switch--readonly" />}
                                 </FormField>
                                 <FormField title={t("common.investmentTypes.fields.enableWorldAreas")}>
-                                    {canChangeParams && <Switch checked={enableWorldAreas} onChange={event => handleEnableWorldAreasChange(event.target.checked)} />}
+                                    {canChangeParams && <Switch checked={enableWorldAreas} onChange={handleEnableWorldAreasChange} />}
                                     {!canChangeParams && <Switch checked={enableWorldAreas} disabled className="switch--readonly" />}
                                 </FormField>
                                 <FormField title={t("common.investmentTypes.fields.showInSidebar")}>
-                                    <Switch checked={showInSidebar} onChange={event => handleShowInSidebarChange(event.target.checked)} />
+                                    <Switch checked={showInSidebar} onChange={handleShowInSidebarChange} />
                                 </FormField>
                                 <FormSeparator />
                                 <FormField type="buttons">
-                                    <Button variant="contained" startIcon={<FontAwesomeIcon icon={faSolid.faSave} />} onClick={() => handleSaveClick()}>
+                                    <Button variant="contained" startIcon={<FontAwesomeIcon icon={faSolid.faSave} />} onClick={handleSaveClick}>
                                         {t("common.buttons.save")}
                                     </Button>
                                 </FormField>

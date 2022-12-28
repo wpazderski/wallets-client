@@ -91,42 +91,54 @@ export function InvestmentForm() {
     const [isProcessing, setIsProcessing] = useState(false);
     const validators = useMemo<{ [key: string]: (() => boolean)}>(() => ({}), []);
     
-    if (purchase.type !== investmentType.purchase) {
-        if (investmentType.purchase === "anyAmountOfMoney") {
-            setPurchase({
-                type: "anyAmountOfMoney",
-                currency: userSettings.mainCurrencyId,
-                amountOfMoney: 1000,
-            });
+    useEffect(() => {
+        if (purchase.type !== investmentType.purchase) {
+            if (investmentType.purchase === "anyAmountOfMoney") {
+                setPurchase({
+                    type: "anyAmountOfMoney",
+                    currency: userSettings.mainCurrencyId,
+                    amountOfMoney: 1000,
+                });
+            }
+            else if (investmentType.purchase === "decimalUnits" || investmentType.purchase === "integerUnits") {
+                setPurchase({
+                    type: investmentType.purchase,
+                    currency: userSettings.mainCurrencyId,
+                    numUnits: 10,
+                    unitPrice: 100,
+                });
+            }
+            else if (investmentType.purchase === "weight") {
+                setPurchase({
+                    type: "weight",
+                    currency: userSettings.mainCurrencyId,
+                    unit: "g",
+                    price: 1000,
+                    weight: 1,
+                });
+            }
         }
-        else if (investmentType.purchase === "decimalUnits" || investmentType.purchase === "integerUnits") {
-            setPurchase({
-                type: investmentType.purchase,
-                currency: userSettings.mainCurrencyId,
-                numUnits: 10,
-                unitPrice: 100,
-            });
-        }
-        else if (investmentType.purchase === "weight") {
-            setPurchase({
-                type: "weight",
-                currency: userSettings.mainCurrencyId,
-                unit: "g",
-                price: 1000,
-                weight: 1,
-            });
-        }
-    }
+    }, [investmentType.purchase, purchase.type, userSettings.mainCurrencyId]);
     
-    const goToInvestmentsList = () => {
+    const goToInvestmentsList = useCallback(() => {
         navigate(getInvestmentsListUrl(investmentTypeSlug));
-    };
+    }, [investmentTypeSlug, navigate]);
     
-    if (investment.type !== investmentType.id) {
-        goToInvestmentsList();
-    }
+    useEffect(() => {
+        if (investment.type !== investmentType.id) {
+            goToInvestmentsList();
+        }
+    }, [goToInvestmentsList, investment.type, investmentType.id]);
     
-    const handleSaveClick = async () => {
+    const validateForm = useCallback(() => {
+        let isOk: boolean = true;
+        for (const validator of Object.values(validators)) {
+            isOk = validator() && isOk;
+        }
+        return isOk;
+    }, [validators]);
+    
+    const handleSaveClick = useCallback(async () => {
         if (!validateForm()) {
             return;
         }
@@ -177,14 +189,7 @@ export function InvestmentForm() {
         finally {
             setIsProcessing(false);
         }
-    };
-    const validateForm = () => {
-        let isOk: boolean = true;
-        for (const validator of Object.values(validators)) {
-            isOk = validator() && isOk;
-        }
-        return isOk;
-    };
+    }, [api, cancellationPolicy, capitalization, dispatch, endDate, goToInvestmentsList, incomeTaxApplicable, interestPeriods, investment, investmentName, isNewInvestment, purchase, startDate, t, targetCurrencies, targetIndustries, targetWorldAreas, validateForm, valueCalculationMethod, walletId]);
     
     useEffect(() => {
         if (startDate === null || valueCalculationMethod.type !== "interest") {
@@ -201,42 +206,58 @@ export function InvestmentForm() {
     const handleNameChange = useCallback((value: InvestmentName) => {
         setInvestmentName(value);
     }, [setInvestmentName]);
+    
     const handleWalletIdChange = useCallback((value: WalletId) => {
         setWalletId(value);
     }, [setWalletId]);
+    
     const handleStartDateChange = useCallback((value: KvapiTypes.Timestamp | null) => {
         setStartDate(value);
     }, [setStartDate]);
+    
     const handleEndDateChange = useCallback((value: KvapiTypes.Timestamp | null) => {
         setEndDate(value);
     }, [setEndDate]);
+    
     const handlePurchaseChange = useCallback((value: InvestmentPurchase) => {
         setPurchase(value);
     }, [setPurchase]);
+    
     const handleValueCalculationMethodChange = useCallback((value: InvestmentValueCalculationMethod) => {
         setValueCalculationMethod(value);
     }, [setValueCalculationMethod]);
+    
     const handleInterestPeriodsChange = useCallback((value: InvestmentInterestPeriod[]) => {
         setInterestPeriods(value);
     }, [setInterestPeriods]);
+    
     const handleCapitalizationChange = useCallback((value: boolean) => {
         setCapitalization(value);
     }, [setCapitalization]);
+    
     const handleIncomeTaxApplicableChange = useCallback((value: boolean) => {
         setIncomeTaxApplicable(value);
     }, [setIncomeTaxApplicable]);
+    
     const handleCancellationPolicyChange = useCallback((value: InvestmentCancellationPolicy) => {
         setCancellationPolicy(value);
     }, [setCancellationPolicy]);
+    
     const handleTargetCurrenciesChange = useCallback((value: InvestmentTarget<InvestmentTargetCurrencyId>[]) => {
         setTargetCurrencies(value);
     }, [setTargetCurrencies]);
+    
     const handleTargetIndustriesChange = useCallback((value: InvestmentTarget<InvestmentTargetIndustryId>[]) => {
         setTargetIndustries(value);
     }, [setTargetIndustries]);
+    
     const handleTargetWorldAreasChange = useCallback((value: InvestmentTarget<InvestmentTargetWorldAreaId>[]) => {
         setTargetWorldAreas(value);
     }, [setTargetWorldAreas]);
+    
+    const validatorCreator = useCallback((validator: () => boolean, validatorName: string) => {
+        validators[validatorName] = validator;
+    }, [validators]);
     
     return (
         <Page className="InvestmentForm">
@@ -249,41 +270,41 @@ export function InvestmentForm() {
                                 <InvestmentNameField
                                     value={investmentName}
                                     onChange={handleNameChange}
-                                    createValidator={(validator, validatorName) => validators[validatorName] = validator}
+                                    createValidator={validatorCreator}
                                 />
                                 <InvestmentWalletIdField
                                     value={walletId}
                                     onChange={handleWalletIdChange}
-                                    createValidator={(validator, validatorName) => validators[validatorName] = validator}
+                                    createValidator={validatorCreator}
                                 />
                                 <InvestmentStartFieldDate
                                     value={startDate}
                                     onChange={handleStartDateChange}
-                                    createValidator={(validator, validatorName) => validators[validatorName] = validator}
+                                    createValidator={validatorCreator}
                                     required={valueCalculationMethod.type === "interest" && interestPeriods.length > 0}
                                 />
                                 {investmentType.enableEndDate && valueCalculationMethod.type !== "interest" && <InvestmentEndDateField
                                     value={endDate}
                                     onChange={handleEndDateChange}
-                                    createValidator={(validator, validatorName) => validators[validatorName] = validator}
+                                    createValidator={validatorCreator}
                                     required={false}
                                 />}
                                 <InvestmentPurchaseField
                                     value={purchase}
                                     onChange={handlePurchaseChange}
-                                    createValidator={(validator, validatorName) => validators[validatorName] = validator}
+                                    createValidator={validatorCreator}
                                     userSettings={userSettings}
                                 />
                                 <InvestmentValueCalculationMethodField
                                     value={valueCalculationMethod}
                                     onChange={handleValueCalculationMethodChange}
-                                    createValidator={(validator, validatorName) => validators[validatorName] = validator}
+                                    createValidator={validatorCreator}
                                     purchase={purchase}
                                 />
                                 {investmentType.enableInterest && <InvestmentInterestPeriodsField
                                     value={interestPeriods}
                                     onChange={handleInterestPeriodsChange}
-                                    createValidator={(validator, validatorName) => validators[validatorName] = validator}
+                                    createValidator={validatorCreator}
                                     currency={purchase.currency}
                                     purchasingUnits={purchase.type === "decimalUnits" || purchase.type === "integerUnits"}
                                     enableCancellationPolicy={investmentType.enableCancellationPolicy}
@@ -291,38 +312,38 @@ export function InvestmentForm() {
                                 {investmentType.enableInterest && <InvestmentCapitalizationField
                                     value={capitalization}
                                     onChange={handleCapitalizationChange}
-                                    createValidator={(validator, validatorName) => validators[validatorName] = validator}
+                                    createValidator={validatorCreator}
                                 />}
                                 <InvestmentIncomeTaxApplicableField
                                     value={incomeTaxApplicable}
                                     onChange={handleIncomeTaxApplicableChange}
-                                    createValidator={(validator, validatorName) => validators[validatorName] = validator}
+                                    createValidator={validatorCreator}
                                 />
                                 {interestPeriods.length === 0 && investmentType.enableCancellationPolicy && <InvestmentCancellationPolicyField
                                     value={cancellationPolicy}
                                     onChange={handleCancellationPolicyChange}
-                                    createValidator={(validator, validatorName) => validators[validatorName] = validator}
+                                    createValidator={validatorCreator}
                                     currency={purchase.currency}
                                     purchasingUnits={purchase.type === "decimalUnits" || purchase.type === "integerUnits"}
                                 />}
                                 {investmentType.enableCurrencies && <InvestmentTargetCurrenciesField
                                     value={targetCurrencies}
                                     onChange={handleTargetCurrenciesChange}
-                                    createValidator={(validator, validatorName) => validators[validatorName] = validator}
+                                    createValidator={validatorCreator}
                                 />}
                                 {investmentType.enableIndustries && <InvestmentTargetIndustriesField
                                     value={targetIndustries}
                                     onChange={handleTargetIndustriesChange}
-                                    createValidator={(validator, validatorName) => validators[validatorName] = validator}
+                                    createValidator={validatorCreator}
                                 />}
                                 {investmentType.enableWorldAreas && <InvestmentTargetWorldAreaField
                                     value={targetWorldAreas}
                                     onChange={handleTargetWorldAreasChange}
-                                    createValidator={(validator, validatorName) => validators[validatorName] = validator}
+                                    createValidator={validatorCreator}
                                 />}
                                 <FormSeparator />
                                 <FormField type="buttons">
-                                    <Button variant="contained" startIcon={<FontAwesomeIcon icon={faSolid.faSave} />} onClick={() => handleSaveClick()}>
+                                    <Button variant="contained" startIcon={<FontAwesomeIcon icon={faSolid.faSave} />} onClick={handleSaveClick}>
                                         {t("common.buttons.save")}
                                     </Button>
                                 </FormField>

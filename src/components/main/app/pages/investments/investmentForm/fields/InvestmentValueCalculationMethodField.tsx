@@ -1,3 +1,4 @@
+import { AutocompleteRenderInputParams, SelectChangeEvent } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
@@ -7,7 +8,7 @@ import TextField from "@mui/material/TextField";
 import * as WalletsTypes from "@wpazderski/wallets-types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { NumericFormat } from "react-number-format";
+import { NumberFormatValues, NumericFormat } from "react-number-format";
 
 import { useAppSelector } from "../../../../../../../app/store";
 import { selectCryptocurrencies, selectCryptocurrencyExchangeRates } from "../../../../../../../app/store/ExternalDataSlice";
@@ -35,6 +36,9 @@ function getAvailableValueCalculationMethods(): InvestmentValueCalculationMethod
 }
 
 export function InvestmentValueCalculationMethodField(props: InvestmentValueCalculationMethodFieldProps) {
+    const createValidator = props.createValidator;
+    const onChange = props.onChange;
+    
     const { t } = useTranslation();
     const cryptocurrencies = useAppSelector(selectCryptocurrencies);
     const cryptocurrencyExchangeRates = useAppSelector(selectCryptocurrencyExchangeRates);
@@ -46,33 +50,54 @@ export function InvestmentValueCalculationMethodField(props: InvestmentValueCalc
     const [obtainerTicker, setObtainerTicker] = useState(props.value.type === "obtainer" ? props.value.ticker : "" as WalletsTypes.data.market.Ticker);
     const [cryptocurrencyId, setCryptocurrencyId] = useState((props.value.type === "cryptocurrency" ? props.value.cryptocurrencyId : "" as WalletsTypes.data.cryptocurrency.Id) || cryptocurrencyIds[0]!);
     
-    const onChange = props.onChange;
+    const handleTypeChange = useCallback((event: SelectChangeEvent<InvestmentValueCalculationMethod["type"]>) => {
+        setValueCalculationMethodType(event.target.value as InvestmentValueCalculationMethod["type"]);
+    }, []);
     
-    const handleTypeChange = (type: InvestmentValueCalculationMethod["type"]) => {
-        setValueCalculationMethodType(type);
-    };
+    const handleCurrentValueChange = useCallback((values: NumberFormatValues) => {
+        setCurrentValue(values.floatValue ?? 0.0);
+    }, []);
     
-    const handleCurrentValueChange = (value: number) => {
-        setCurrentValue(value);
-    };
+    const isCurrentValueAllowed = useCallback((values: NumberFormatValues) => {
+        return values.floatValue !== undefined && (values.floatValue >= 0.0 && values.floatValue <= 9999999999);
+    }, []);
     
-    const handleObtainerTickerChange = (ticker: WalletsTypes.data.market.Ticker) => {
-        setObtainerTicker(ticker);
-    };
+    const handleObtainerTickerChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setObtainerTicker(event.target.value as WalletsTypes.data.market.Ticker);
+    }, []);
     
-    const handleCryptocurrencyIdChange = (cryptocurrencyId: WalletsTypes.data.cryptocurrency.Id | null) => {
+    const handleCryptocurrencyIdChange = useCallback((_event: React.SyntheticEvent, cryptocurrencyId: WalletsTypes.data.cryptocurrency.Id | null) => {
         if (cryptocurrencyId) {
             setCryptocurrencyId(cryptocurrencyId);
         }
-    };
+    }, []);
+    
+    const getCryptocurrencyIdOptionLabel = useCallback((option: WalletsTypes.data.cryptocurrency.Id) => {
+        return `${cryptocurrencies.find(cc => cc.id === option)?.name ?? option} (${option})`;
+    }, [cryptocurrencies]);
+    
+    const renderCryptocurrencyIdInput = useCallback((params: AutocompleteRenderInputParams) => {
+        return (
+            <div className="InvestmentTypeForm__icon-select__selected-value">
+                <TextField
+                    {...params}
+                    inputProps={{
+                        ...params.inputProps,
+                        label: t("common.investments.fields.valueCalculationMethod.cryptocurrencyId"),
+                        autoComplete: "new-password",
+                    }}
+                />
+            </div>
+        );
+    }, [t]);
     
     const validateField = useCallback(() => {
         return true;
     }, []);
     
     useEffect(() => {
-        props.createValidator(validateField, "valueCalculationMethod");
-    }, [props, validateField]);
+        createValidator(validateField, "valueCalculationMethod");
+    }, [createValidator, validateField]);
     
     useEffect(() => {
         if (valueCalculationMethod === "manual") {
@@ -108,7 +133,7 @@ export function InvestmentValueCalculationMethodField(props: InvestmentValueCalc
                     label={t("common.investments.fields.valueCalculationMethod.type")}
                     labelId="investment-valueCalculationMethod-type-label"
                     value={valueCalculationMethod}
-                    onChange={event => handleTypeChange(event.target.value as InvestmentValueCalculationMethod["type"])}
+                    onChange={handleTypeChange}
                     sx={{ width: "100%" }}
                 >
                     {getAvailableValueCalculationMethods().map(method => <MenuItem key={method} value={method}>{t(`common.investments.fields.valueCalculationMethod.type.${method}`)}</MenuItem>)}
@@ -122,12 +147,12 @@ export function InvestmentValueCalculationMethodField(props: InvestmentValueCalc
                             decimalSeparator="."
                             suffix={" " + props.purchase.currency}
                             label={t("common.investments.fields.valueCalculationMethod.currentValue")}
-                            isAllowed={values => values.floatValue !== undefined && (values.floatValue >= 0.0 && values.floatValue <= 9999999999)}
+                            isAllowed={isCurrentValueAllowed}
                             decimalScale={2}
                             customInput={TextField}
                             allowNegative={false}
                             value={currentValue}
-                            onValueChange={value => handleCurrentValueChange(value.floatValue ?? 0.0)}
+                            onValueChange={handleCurrentValueChange}
                         />
                     </FormControl>
                 </>
@@ -138,7 +163,7 @@ export function InvestmentValueCalculationMethodField(props: InvestmentValueCalc
                         <TextField
                             label={t("common.investments.fields.valueCalculationMethod.obtainerTicker")}
                             value={obtainerTicker}
-                            onChange={event => handleObtainerTickerChange(event.target.value as WalletsTypes.data.market.Ticker)}
+                            onChange={handleObtainerTickerChange}
                         />
                         <p>{t("common.investments.fields.valueCalculationMethod.obtainerTicker.extraInfo")}</p>
                     </FormControl>
@@ -150,21 +175,10 @@ export function InvestmentValueCalculationMethodField(props: InvestmentValueCalc
                         <Autocomplete
                             options={cryptocurrencyIds}
                             value={cryptocurrencyId}
-                            onChange={(_, value) => handleCryptocurrencyIdChange(value as WalletsTypes.data.cryptocurrency.Id | null)}
+                            onChange={handleCryptocurrencyIdChange}
                             autoHighlight
-                            getOptionLabel={option => `${cryptocurrencies.find(cc => cc.id === option)?.name ?? option} (${option})`}
-                            renderInput={params => (
-                                <div className="InvestmentTypeForm__icon-select__selected-value">
-                                    <TextField
-                                        {...params}
-                                        inputProps={{
-                                            ...params.inputProps,
-                                            label: t("common.investments.fields.valueCalculationMethod.cryptocurrencyId"),
-                                            autoComplete: "new-password",
-                                        }}
-                                    />
-                                </div>
-                            )}
+                            getOptionLabel={getCryptocurrencyIdOptionLabel}
+                            renderInput={renderCryptocurrencyIdInput}
                         />
                     </FormControl>
                 </>

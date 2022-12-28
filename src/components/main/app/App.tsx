@@ -8,7 +8,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 
 import { UserSessionManager } from "../../../app";
 import { useApiContext } from "../../../app/ApiContext";
-import { useAppDispatch, useAppSelector, userSlice } from "../../../app/store";
+import { store, useAppDispatch, useAppSelector } from "../../../app/store";
 import { loadAppInfoAsync, selectLoadingState } from "../../../app/store/AppInfoSlice";
 import { LoadingIndicator } from "../common/loadingIndicator/LoadingIndicator";
 import { AppMain } from "./appMain/AppMain";
@@ -37,8 +37,6 @@ export function App() {
     const api = useApiContext();
     const dispatch = useAppDispatch();
     const loadingState = useAppSelector(selectLoadingState);
-    const userRole = useAppSelector(userSlice.selectUserRole);
-    const userIsFullyLoaded = useAppSelector(userSlice.selectUserIsFullyLoaded);
     
     useEffect(() => {
         if (loadingState === "not-loaded") {
@@ -50,12 +48,16 @@ export function App() {
         document.title = t("appTitle");
     }, [t]);
     
-    const handleApiRequestError = (error: Error) => {
-        if (userRole !== "unauthorized" && userIsFullyLoaded && error.message.includes("401 Unauthorized")) {
-            UserSessionManager.resetUserDependantStores();
-        }
-    };
-    api.setRequestErrorHandler(handleApiRequestError);
+    useEffect(() => {
+        const handleApiRequestError = (error: Error) => {
+            const storeState = store.getState();
+            if (storeState.user.role !== "unauthorized" && storeState.user.isFullyLoaded && error.message.includes("401 Unauthorized")) {
+                UserSessionManager.resetUserDependantStores();
+            }
+        };
+        api.setRequestErrorHandler(handleApiRequestError);
+    }, [api]);
+    
     
     return (
         <Router>

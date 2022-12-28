@@ -2,7 +2,7 @@ import "./AppSidebar.scss";
 
 import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { resolveServerError, UserSessionManager } from "../../../../app";
@@ -29,7 +29,7 @@ export function AppSidebar() {
     const investmentTypes = useAppSelector(selectInvestmentTypesList);
     const [isProcessing, setIsProcessing] = useState(false);
     
-    const handleLogoutClick = async () => {
+    const handleLogoutClick = useCallback(async () => {
         setIsProcessing(true);
         try {
             await UserSessionManager.signOut(api);
@@ -44,7 +44,7 @@ export function AppSidebar() {
             }));
         }
         setIsProcessing(false);
-    };
+    }, [api, dispatch, t]);
     
     return (
         <div className="AppSidebar">

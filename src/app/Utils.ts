@@ -68,4 +68,67 @@ export class Utils {
         return formattedStr;
     }
     
+    static formatInt(value: number, digits: number): string {
+        return value.toString().padStart(digits, "0");
+    }
+    
+    static formatDateTime(timestamp: number, showDate?: boolean, showTime?: boolean, showMsec?: boolean): string {
+        let dateTimeStr: string;
+        if (timestamp === 0) {
+            dateTimeStr = "-";
+        }
+        else {
+            const dt = new Date(timestamp);
+            let displayedElements: string[] = [];
+            if (showDate) {
+                displayedElements.push(`${this.formatInt(dt.getDate(), 2)}.${this.formatInt(dt.getMonth() + 1, 2)}.${this.formatInt(dt.getFullYear(), 4)}`);
+            }
+            if (showTime) {
+                let str = `${this.formatInt(dt.getHours(), 2)}:${this.formatInt(dt.getMinutes(), 2)}:${this.formatInt(dt.getSeconds(), 2)}`;
+                if (showMsec) {
+                    str += `.${this.formatInt(dt.getMilliseconds(), 3)}`;
+                }
+                displayedElements.push(str);
+            }
+            dateTimeStr = displayedElements.join(" ");
+        }
+        return dateTimeStr;
+    }
+    
+    static formatDuration(startTimestamp: number, endTimestamp: number): string {
+        const start = new Date(startTimestamp);
+        const end = new Date(endTimestamp);
+        
+        let years = end.getFullYear() - start.getFullYear();
+        let months = end.getMonth() - start.getMonth();
+        let days = end.getDate() - start.getDate();
+        if (days < 0) {
+            --months;
+            const dt = new Date(end);
+            dt.setDate(0);
+            days += dt.getDate();
+        }
+        if (months < 0) {
+            --years;
+            months += 12;
+        }
+        
+        const parts: string[] = [];
+        if (years > 0) {
+            parts.push(`${years}y`);
+        }
+        if (months > 0) {
+            parts.push(`${months}m`);
+        }
+        if (days > 0) {
+            parts.push(`${days}d`);
+        }
+        if (parts.length === 0) {
+            parts.push("< 1d");
+        }
+        
+        return parts.join(" ");
+    }
+    
+    
 }

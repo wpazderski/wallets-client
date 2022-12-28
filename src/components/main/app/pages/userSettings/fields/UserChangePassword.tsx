@@ -4,7 +4,7 @@ import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import * as KvapiTypes from "@wpazderski/kvapi-types";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { resolveServerError, useApiContext, UserSessionManager } from "../../../../../../app";
@@ -23,6 +23,8 @@ export interface UserChangePasswordProps {
 }
 
 export function UserChangePassword(props: UserChangePasswordProps) {
+    const withProcessing = props.withProcessing;
+    
     const { t } = useTranslation();
     const api = useApiContext();
     const dispatch = useAppDispatch();
@@ -41,8 +43,8 @@ export function UserChangePassword(props: UserChangePasswordProps) {
     const newPasswordError = (!touchedNewPassword || isNewPasswordOk) ? "" : t("page.userSettings.form.changePassword.newPassword.error.tooShort");
     const newPasswordRepeatedError = (!touchedNewPasswordRepeated || isNewPasswordRepeatedOk) ? "" : t("page.userSettings.form.changePassword.passwordRepeated.error.mismatch");
     
-    const handleChangePasswordClick = () => {
-        props.withProcessing(async () => {
+    const handleChangePasswordClick = useCallback(() => {
+        withProcessing(async () => {
             try {
                 await UserSessionManager.changeUserPassword(api, newPassword as KvapiTypes.data.user.PlainPassword);
                 dispatch(updateSelfAsync(api));
@@ -66,22 +68,22 @@ export function UserChangePassword(props: UserChangePasswordProps) {
                 };
             }
         })();
-    };
+    }, [api, dispatch, newPassword, t, withProcessing]);
     
-    const handleCurrentPasswordChange = (value: string) => {
-        setCurrentPassword(value);
+    const handleCurrentPasswordChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setCurrentPassword(event.target.value);
         setTouchedCurrentPassword(true);
-    };
+    }, []);
     
-    const handleNewPasswordChange = (value: string) => {
-        setNewPassword(value);
+    const handleNewPasswordChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setNewPassword(event.target.value);
         setTouchedNewPassword(true);
-    };
+    }, []);
     
-    const handleNewPasswordRepeatedChange = (value: string) => {
-        setNewPasswordRepeated(value);
+    const handleNewPasswordRepeatedChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setNewPasswordRepeated(event.target.value);
         setTouchedNewPasswordRepeated(true);
-    };
+    }, []);
     
     return (
         <>
@@ -97,7 +99,7 @@ export function UserChangePassword(props: UserChangePasswordProps) {
                 <TextField
                     type="password"
                     value={currentPassword}
-                    onChange={e => handleCurrentPasswordChange(e.target.value)}
+                    onChange={handleCurrentPasswordChange}
                     error={!!currentPasswordError} helperText={currentPasswordError || " "}
                 />
             </FormField>
@@ -105,7 +107,7 @@ export function UserChangePassword(props: UserChangePasswordProps) {
                 <TextField
                     type="password"
                     value={newPassword}
-                    onChange={e => handleNewPasswordChange(e.target.value)}
+                    onChange={handleNewPasswordChange}
                     error={!!newPasswordError}
                     helperText={newPasswordError || " "}
                 />
@@ -114,13 +116,13 @@ export function UserChangePassword(props: UserChangePasswordProps) {
                 <TextField
                     type="password"
                     value={newPasswordRepeated}
-                    onChange={e => handleNewPasswordRepeatedChange(e.target.value)}
+                    onChange={handleNewPasswordRepeatedChange}
                     error={!!newPasswordRepeatedError}
                     helperText={newPasswordRepeatedError || " "}
                 />
             </FormField>
             <FormField type="buttons">
-                <Button variant="contained" onClick={() => handleChangePasswordClick()} disabled={!canFormBeSubmitted} startIcon={<FontAwesomeIcon icon={faSolid.faKey} />}>
+                <Button variant="contained" onClick={handleChangePasswordClick} disabled={!canFormBeSubmitted} startIcon={<FontAwesomeIcon icon={faSolid.faKey} />}>
                     {t("page.userSettings.form.changePassword.button")}
                 </Button>
             </FormField>

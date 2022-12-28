@@ -2,11 +2,12 @@ import "./AppMain.scss";
 
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
+import { useCallback } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import { appSlice, useAppDispatch, useAppSelector, userSlice } from "../../../../app/store";
 import { selectHasAnyUsers } from "../../../../app/store/AppInfoSlice";
-import { hideUserMessage } from "../../../../app/store/AppSlice";
+import { hideUserMessage, UserMessage } from "../../../../app/store/AppSlice";
 import { InvestmentDetails } from "../pages/investments/investmentDetails/InvestmentDetails";
 import { InvestmentForm } from "../pages/investments/investmentForm/InvestmentForm";
 import { Investments } from "../pages/investments/Investments";
@@ -28,16 +29,11 @@ import { Wallets } from "../pages/wallets/Wallets";
 
 
 export function AppMain() {
-    const dispatch = useAppDispatch();
     const appHasAnyUsers = useAppSelector(selectHasAnyUsers);
     const userRole = useAppSelector(userSlice.selectUserRole);
     const userLastPasswordUpdateTimestamp = useAppSelector(userSlice.selectUserLastPasswordUpdateTimestamp);
     const userIsFullyLoaded = useAppSelector(userSlice.selectUserIsFullyLoaded);
     const userMessages = useAppSelector(appSlice.selectUserMessages);
-    
-    const handleAlertClick = (userMessageId: number) => {
-        dispatch(hideUserMessage(userMessageId));
-    };
     
     return (
         <div className="AppMain">
@@ -91,17 +87,32 @@ export function AppMain() {
             >
                 <div className="AppMain__snackbar-alerts-container">
                     {userMessages.map(userMessage =>
-                        <Alert
-                            severity={userMessage.type}
-                            variant="filled"
-                            key={userMessage.id}
-                            onClick={() => handleAlertClick(userMessage.id)}
-                        >
-                            {userMessage.message}
-                        </Alert>
+                        <UserMessageAlert key={userMessage.id} userMessage={userMessage} />
                     )}
                 </div>
             </Snackbar>
         </div>
+    );
+}
+
+interface UserMessageAlertProps {
+    userMessage: UserMessage;
+}
+
+function UserMessageAlert(props: UserMessageAlertProps) {
+    const dispatch = useAppDispatch();
+    
+    const handleClick = useCallback(() => {
+        dispatch(hideUserMessage(props.userMessage.id));
+    }, [dispatch, props.userMessage.id]);
+    
+    return (
+        <Alert
+            severity={props.userMessage.type}
+            variant="filled"
+            onClick={handleClick}
+        >
+            {props.userMessage.message}
+        </Alert>
     );
 }

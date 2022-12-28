@@ -29,13 +29,11 @@ export function SummaryByInvestmentTypeTab(props: SummaryByInvestmentTypeTabProp
     const externalData = useAppSelector(selectExternalData);
     const userSettings = useAppSelector(selectUserSettings);
     
-    const includedWallets = props.includedWallets;
-    
     const entries: Entry[] = useMemo(() => {
         return investmentTypes.map(investmentType => {
             const value = investments
                 .map(investment => {
-                    if (!includedWallets.includes(investment.walletId) || investment.type !== investmentType.id) {
+                    if (!props.includedWallets.includes(investment.walletId) || investment.type !== investmentType.id) {
                         return 0;
                     }
                     const value = new Calculator(investment, externalData, userSettings).calculate();
@@ -48,7 +46,7 @@ export function SummaryByInvestmentTypeTab(props: SummaryByInvestmentTypeTabProp
                 value,
             };
         }).filter(entry => !!entry) as Entry[];
-    }, [investments, investmentTypes, t, externalData, userSettings, includedWallets]);
+    }, [investments, investmentTypes, t, externalData, userSettings, props.includedWallets]);
     
     return (
         <div className="SummaryByInvestmentTypeTab">

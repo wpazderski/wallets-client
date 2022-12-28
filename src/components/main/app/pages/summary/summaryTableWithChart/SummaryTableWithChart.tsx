@@ -61,15 +61,9 @@ export function SummaryTableWithChart(props: TableWithChartProps) {
     const [worldMapData, setWorldMapData] = useState<any>(null);
     const [worldMapDataLoadingState, setWorldMapDataLoadingState] = useState<WorldMapDataLoadingState>("initial");
     
-    const propsEntries = props.entries;
-    const propsColumns = props.columns;
-    const propsFooter = props.footer;
-    const propsChartLabelFormatter = props.chartLabelFormatter;
-    const mainCurrencyId = props.mainCurrencyId;
-    
     const entries = useMemo(() => {
-        return [...propsEntries].sort((a, b) => b.value - a.value);
-    }, [propsEntries]);
+        return [...props.entries].sort((a, b) => b.value - a.value);
+    }, [props.entries]);
     
     const totalValue = useMemo(() => {
         return entries.map(entry => entry.value).reduce((sum, current) => sum + current, 0);
@@ -79,9 +73,11 @@ export function SummaryTableWithChart(props: TableWithChartProps) {
         return t(`page.summary.table.${textKey}`);
     }, [t]);
     
-    const columns = useMemo(() => propsColumns ?? getDefaultColumns(totalValue, mainCurrencyId, tableElementTextResolver), [propsColumns, totalValue, mainCurrencyId, tableElementTextResolver]);
-    const footer = useMemo(() => propsFooter ?? getDefaultFooter(totalValue, tableElementTextResolver), [propsFooter, totalValue, tableElementTextResolver]);
-    const chartLabelFormatter = useMemo(() => propsChartLabelFormatter ?? getDefaultChartLabelFormatter(totalValue, mainCurrencyId), [propsChartLabelFormatter, totalValue, mainCurrencyId]);
+    const columns = useMemo(() => props.columns ?? getDefaultColumns(totalValue, props.mainCurrencyId, tableElementTextResolver), [props.columns, totalValue, props.mainCurrencyId, tableElementTextResolver]);
+    
+    const footer = useMemo(() => props.footer ?? getDefaultFooter(totalValue, tableElementTextResolver), [props.footer, totalValue, tableElementTextResolver]);
+    
+    const chartLabelFormatter = useMemo(() => props.chartLabelFormatter ?? getDefaultChartLabelFormatter(totalValue, props.mainCurrencyId), [props.chartLabelFormatter, totalValue, props.mainCurrencyId]);
     
     const chartOptions = useMemo(() => {
         return {
@@ -112,6 +108,14 @@ export function SummaryTableWithChart(props: TableWithChartProps) {
         };
     }, [entries]);
     
+    const countries = useMemo(() => {
+        if (!worldMapData) {
+            return [];
+        }
+        const countries = (ChartGeo.topojson.feature(worldMapData, worldMapData.objects.countries) as any).features;
+        return countries;
+    }, [worldMapData]);
+    
     useEffect(() => {
         if (props.withWorldMap && worldMapDataLoadingState === "initial") {
             setWorldMapDataLoadingState("loading");
@@ -125,14 +129,6 @@ export function SummaryTableWithChart(props: TableWithChartProps) {
             });
         }
     }, [props.withWorldMap, worldMapDataLoadingState]);
-    
-    const countries = useMemo(() => {
-        if (!worldMapData) {
-            return [];
-        }
-        const countries = (ChartGeo.topojson.feature(worldMapData, worldMapData.objects.countries) as any).features;
-        return countries;
-    }, [worldMapData]);
     
     useEffect(() => {
         if (!worldMapRef.current) {

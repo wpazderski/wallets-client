@@ -10,7 +10,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
-import { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
@@ -73,8 +73,6 @@ export function Wallets() {
     const [deleteConfirmWalletName, setDeleteConfirmWalletName] = useState("");
     const [isWalletDeleteConfirmOpen, setIsWalletDeleteConfirmOpen] = useState(false);
     
-    const mainCurrencyId = userSettings.mainCurrencyId;
-    
     const rows: Row[] = useMemo(() => {
         return wallets.map(wallet => ({
             ...wallet,
@@ -89,12 +87,13 @@ export function Wallets() {
         }));
     }, [wallets, investments, externalData, userSettings]);
     
-    const handleChangeName = (name: WalletName) => {
-        setFormWalletName(name);
-    };
-    const handleChangeDescription = (description: WalletDescription) => {
-        setFormWalletDescription(description);
-    };
+    const handleChangeName = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setFormWalletName(event.target.value as WalletName);
+    }, []);
+    
+    const handleChangeDescription = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setFormWalletDescription(event.target.value as WalletDescription);
+    }, []);
     
     const handleEditWalletClick = useCallback((walletId: string) => {
         const wallet = wallets.find(wallet => wallet.id === walletId);
@@ -108,28 +107,15 @@ export function Wallets() {
         setIsFormOpen(true);
     }, [wallets]);
     
-    const handleCreateWalletClick = () => {
+    const handleCreateWalletClick = useCallback(() => {
         setFormWalletId("" as WalletId);
         setFormWalletName("" as WalletName);
         setFormWalletDescription("" as WalletDescription);
         setFormState("create-wallet");
         setIsFormOpen(true);
-    };
+    }, []);
     
-    const handleCancelFormClick = () => {
-        setIsFormOpen(false);
-    };
-    
-    const handleSaveFormClick = () => {
-        if (formState === "create-wallet") {
-            createWallet();
-        }
-        else if (formState === "edit-wallet") {
-            updateWallet();
-        }
-    };
-    
-    const createWallet = async () => {
+    const createWallet = useCallback(async () => {
         setIsProcessing(true);
         const wallet: Wallet = {
             id: "" as WalletId,
@@ -162,9 +148,9 @@ export function Wallets() {
         }
         setIsProcessing(false);
         setIsFormOpen(false);
-    };
+    }, [api, dispatch, formWalletDescription, formWalletName, t]);
     
-    const updateWallet = async () => {
+    const updateWallet = useCallback(async () => {
         setIsProcessing(true);
         const wallet: Wallet = {
             id: formWalletId,
@@ -197,7 +183,20 @@ export function Wallets() {
         }
         setIsProcessing(false);
         setIsFormOpen(false);
-    };
+    }, [api, dispatch, formWalletDescription, formWalletId, formWalletName, t]);
+    
+    const handleSaveFormClick = useCallback(() => {
+        if (formState === "create-wallet") {
+            createWallet();
+        }
+        else if (formState === "edit-wallet") {
+            updateWallet();
+        }
+    }, [createWallet, formState, updateWallet]);
+    
+    const handleCancelFormClick = useCallback(() => {
+        setIsFormOpen(false);
+    }, []);
     
     const handleDeleteWalletClick = useCallback((walletId: string) => {
         const wallet = wallets.find(wallet => wallet.id === walletId);
@@ -208,15 +207,18 @@ export function Wallets() {
         setDeleteConfirmWalletName(wallet.name);
         setIsWalletDeleteConfirmOpen(true);
     }, [wallets]);
-    const handleDeleteWalletClose = () => {
+    
+    const handleDeleteWalletClose = useCallback(() => {
         setWalletToDelete(null);
         setIsWalletDeleteConfirmOpen(false);
-    };
-    const handleDeleteWalletCancelClick = () => {
+    }, []);
+    
+    const handleDeleteWalletCancelClick = useCallback(() => {
         setWalletToDelete(null);
         setIsWalletDeleteConfirmOpen(false);
-    };
-    const handleDeleteWalletConfirmClick = async () => {
+    }, []);
+    
+    const handleDeleteWalletConfirmClick = useCallback(async () => {
         const walletId = walletToDelete!.id;
         setIsProcessing(true);
         try {
@@ -244,7 +246,7 @@ export function Wallets() {
         }
         setWalletToDelete(null);
         setIsWalletDeleteConfirmOpen(false);
-    };
+    }, [api, dispatch, t, walletToDelete]);
     
     const columns: GridColDef[] = useMemo(() => [
         {
@@ -277,7 +279,7 @@ export function Wallets() {
             width: 250,
             renderCell: params => {
                 return (
-                    <NumberView num={params.value} currency={mainCurrencyId} />
+                    <NumberView num={params.value} currency={userSettings.mainCurrencyId} />
                 );
             },
         },
@@ -285,20 +287,17 @@ export function Wallets() {
             field: "id",
             headerName: t("page.wallets.table.actions"),
             width: 200,
-            renderCell: params => {
-                return (
-                    <>
-                        <Button variant="contained" onClick={() => handleEditWalletClick(params.row.id)} disabled={params.row.isPredefined}>
-                            <FontAwesomeIcon icon={faSolid.faPen} />
-                        </Button>
-                        <Button variant="contained" color="warning" onClick={() => handleDeleteWalletClick(params.row.id)} disabled={params.row.isPredefined || params.row.numInvestments > 0}>
-                            <FontAwesomeIcon icon={faSolid.faTrash} />
-                        </Button>
-                    </>
-                )
-            },
+            renderCell: params => (
+                <WalletRowButtons
+                    walletId={params.row.id}
+                    isPredefined={params.row.isPredefined}
+                    numInvestments={params.row.numInvestments}
+                    onEditWalletClick={handleEditWalletClick}
+                    onDeleteWalletClick={handleDeleteWalletClick}
+                />
+            ),
         },
-    ], [handleDeleteWalletClick, handleEditWalletClick, mainCurrencyId, t]);
+    ], [handleDeleteWalletClick, handleEditWalletClick, userSettings.mainCurrencyId, t]);
     
     return (
         <Page className="Wallets">
@@ -308,7 +307,7 @@ export function Wallets() {
                     variant="contained"
                     startIcon={<FontAwesomeIcon icon={faSolid.faFolderPlus} />}
                     sx={{ marginBottom: 3 }}
-                    onClick={() => handleCreateWalletClick()}
+                    onClick={handleCreateWalletClick}
                 >
                     {t("page.wallets.createWallet")}
                 </Button>
@@ -323,7 +322,7 @@ export function Wallets() {
             </PageContent>
             <Dialog
                 open={isWalletDeleteConfirmOpen}
-                onClose={() => handleDeleteWalletClose()}
+                onClose={handleDeleteWalletClose}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
@@ -333,11 +332,11 @@ export function Wallets() {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ margin: 3 }}>
-                    <Button variant="contained" color="warning" onClick={() => handleDeleteWalletConfirmClick()} autoFocus>{t("common.buttons.yes")}</Button>
-                    <Button onClick={() => handleDeleteWalletCancelClick()}>{t("common.buttons.no")}</Button>
+                    <Button variant="contained" color="warning" onClick={handleDeleteWalletConfirmClick} autoFocus>{t("common.buttons.yes")}</Button>
+                    <Button onClick={handleDeleteWalletCancelClick}>{t("common.buttons.no")}</Button>
                 </DialogActions>
             </Dialog>
-            <Dialog open={isFormOpen} onClose={() => handleCancelFormClick()}>
+            <Dialog open={isFormOpen} onClose={handleCancelFormClick}>
                 <DialogTitle>{formState === "create-wallet" ? t("page.wallets.form.create") : t("page.wallets.form.edit")}</DialogTitle>
                 <DialogContent sx={{ margin: 3, marginBottom: 0 }}>
                     <TextField
@@ -346,7 +345,7 @@ export function Wallets() {
                         label={t("page.wallets.form.name")}
                         fullWidth
                         variant="standard"
-                        onChange={event => handleChangeName(event.target.value as WalletName)}
+                        onChange={handleChangeName}
                         value={formWalletName}
                     />
                     <TextField
@@ -357,16 +356,48 @@ export function Wallets() {
                         fullWidth
                         variant="standard"
                         rows={4}
-                        onChange={event => handleChangeDescription(event.target.value as WalletDescription)}
+                        onChange={handleChangeDescription}
                         value={formWalletDescription}
                     />
                 </DialogContent>
                 <DialogActions sx={{ margin: 3 }}>
-                    <Button onClick={() => handleSaveFormClick()} variant="contained">{t("page.wallets.form.buttons.save")}</Button>
-                    <Button onClick={() => handleCancelFormClick()}>{t("page.wallets.form.buttons.cancel")}</Button>
+                    <Button onClick={handleSaveFormClick} variant="contained">{t("page.wallets.form.buttons.save")}</Button>
+                    <Button onClick={handleCancelFormClick}>{t("page.wallets.form.buttons.cancel")}</Button>
                 </DialogActions>
             </Dialog>
             {isProcessing && <LoadingIndicator />}
         </Page>
+    );
+}
+
+interface WalletRowButtonsProps {
+    walletId: WalletId;
+    isPredefined: boolean;
+    numInvestments: number;
+    onEditWalletClick: (walletId: WalletId) => void;
+    onDeleteWalletClick: (walletId: WalletId) => void;
+}
+
+function WalletRowButtons(props: WalletRowButtonsProps) {
+    const onEditWalletClick = props.onEditWalletClick;
+    const onDeleteWalletClick = props.onDeleteWalletClick;
+    
+    const handleEditWalletClick = useCallback(() => {
+        onEditWalletClick(props.walletId);
+    }, [onEditWalletClick, props.walletId]);
+    
+    const handleDeleteWalletClick = useCallback(() => {
+        onDeleteWalletClick(props.walletId);
+    }, [onDeleteWalletClick, props.walletId]);
+    
+    return (
+        <div>
+            <Button variant="contained" onClick={handleEditWalletClick} disabled={props.isPredefined}>
+                <FontAwesomeIcon icon={faSolid.faPen} />
+            </Button>
+            <Button variant="contained" color="warning" onClick={handleDeleteWalletClick} disabled={props.isPredefined || props.numInvestments > 0}>
+                <FontAwesomeIcon icon={faSolid.faTrash} />
+            </Button>
+        </div>
     );
 }

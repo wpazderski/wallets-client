@@ -70,7 +70,7 @@ export function UsersList() {
         }).catch(handleLoadingError);
     }, [dispatch, api, handleLoadingError]);
     
-    const handleRefreshClick = () => {
+    const handleRefreshClick = useCallback(() => {
         setIsRefreshing(true);
         dispatch(loadUsersListAsync(api)).then(result => {
             setIsRefreshing(false);
@@ -78,11 +78,11 @@ export function UsersList() {
                 throw "error" in result ? result.error : new Error();
             }
         }).catch(handleLoadingError);
-    };
+    }, [api, dispatch, handleLoadingError]);
     
-    const handleCreateUserClick = () => {
+    const handleCreateUserClick = useCallback(() => {
         navigate(getCreateUserUrl());
-    };
+    }, [navigate]);
     
     const handleEditUserClick = useCallback((userId: KvapiTypes.data.user.Id) => {
         navigate(getEditUserUrl(userId));
@@ -97,7 +97,8 @@ export function UsersList() {
         setDeleteConfirmUserLogin(user.login);
         setIsUserDeleteConfirmOpen(true);
     }, [rows]);
-    const handleDeleteUserConfirmClick = async () => {
+    
+    const handleDeleteUserConfirmClick = useCallback(async () => {
         const userId = userToDelete!.id;
         setIsProcessing(true);
         try {
@@ -125,15 +126,17 @@ export function UsersList() {
         }
         setUserToDelete(null);
         setIsUserDeleteConfirmOpen(false);
-    };
-    const handleDeleteUserCancelClick = () => {
+    }, [api, dispatch, t, userToDelete]);
+    
+    const handleDeleteUserCancelClick = useCallback(() => {
         setUserToDelete(null);
         setIsUserDeleteConfirmOpen(false);
-    };
-    const handleDeleteUserClose = () => {
+    }, []);
+    
+    const handleDeleteUserClose = useCallback(() => {
         setUserToDelete(null);
         setIsUserDeleteConfirmOpen(false);
-    };
+    }, []);
     
     const columns: GridColDef[] = useMemo(() => [
         {
@@ -153,14 +156,12 @@ export function UsersList() {
             width: 150,
             renderCell: params => {
                 return (
-                    <>
-                        <Button variant="contained" onClick={() => handleEditUserClick(params.row.id)}>
-                            <FontAwesomeIcon icon={faSolid.faPen} />
-                        </Button>
-                        <Button variant="contained" color="warning" onClick={() => handleDeleteUserClick(params.row.id)} disabled={params.row.id === signedInUserId}>
-                            <FontAwesomeIcon icon={faSolid.faTrash} />
-                        </Button>
-                    </>
+                    <UserRowButtons
+                        userId={params.row.id}
+                        isCurrentUser={params.row.id === signedInUserId}
+                        onEditUserClick={handleEditUserClick}
+                        onDeleteUserClick={handleDeleteUserClick}
+                    />
                 )
             },
         },
@@ -176,7 +177,7 @@ export function UsersList() {
                             variant="contained"
                             startIcon={<FontAwesomeIcon icon={faSolid.faUserPlus} />}
                             sx={{ marginBottom: 3 }}
-                            onClick={() => handleCreateUserClick()}
+                            onClick={handleCreateUserClick}
                         >
                             {t("page.usersList.createUser")}
                         </Button>
@@ -184,7 +185,7 @@ export function UsersList() {
                             className="UsersList__refresh-button"
                             variant="text"
                             sx={{ marginBottom: 3, minWidth:0 }}
-                            onClick={() => handleRefreshClick()}
+                            onClick={handleRefreshClick}
                         >
                             <FontAwesomeIcon icon={faSolid.faRefresh} />
                         </Button>
@@ -201,7 +202,7 @@ export function UsersList() {
             </PageContent>
             <Dialog
                 open={isUserDeleteConfirmOpen}
-                onClose={() => handleDeleteUserClose()}
+                onClose={handleDeleteUserClose}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
@@ -211,11 +212,42 @@ export function UsersList() {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ margin: 3 }}>
-                    <Button variant="contained" color="warning" onClick={() => handleDeleteUserConfirmClick()} autoFocus>{t("common.buttons.yes")}</Button>
-                    <Button onClick={() => handleDeleteUserCancelClick()}>{t("common.buttons.no")}</Button>
+                    <Button variant="contained" color="warning" onClick={handleDeleteUserConfirmClick} autoFocus>{t("common.buttons.yes")}</Button>
+                    <Button onClick={handleDeleteUserCancelClick}>{t("common.buttons.no")}</Button>
                 </DialogActions>
             </Dialog>
             {(isLoading || isProcessing || isRefreshing) && <LoadingIndicator />}
         </Page>
+    );
+}
+
+interface UserRowButtonsProps {
+    userId: KvapiTypes.data.user.Id;
+    isCurrentUser: boolean;
+    onEditUserClick: (userId: KvapiTypes.data.user.Id) => void;
+    onDeleteUserClick: (userId: KvapiTypes.data.user.Id) => void;
+}
+
+function UserRowButtons(props: UserRowButtonsProps) {
+    const onEditUserClick = props.onEditUserClick;
+    const onDeleteUserClick = props.onDeleteUserClick;
+    
+    const handleEditUserClick = useCallback(() => {
+        onEditUserClick(props.userId);
+    }, [onEditUserClick, props.userId]);
+    
+    const handleDeleteUserClick = useCallback(() => {
+        onDeleteUserClick(props.userId);
+    }, [onDeleteUserClick, props.userId]);
+    
+    return (
+        <div>
+            <Button variant="contained" onClick={handleEditUserClick}>
+                <FontAwesomeIcon icon={faSolid.faPen} />
+            </Button>
+            <Button variant="contained" color="warning" onClick={handleDeleteUserClick} disabled={props.isCurrentUser}>
+                <FontAwesomeIcon icon={faSolid.faTrash} />
+            </Button>
+        </div>
     );
 }

@@ -1,19 +1,27 @@
 import "./Form.scss";
 
-import { FormEvent } from "react";
+import { useCallback } from "react";
 
 
 
 
 
 export interface FormProps extends React.PropsWithChildren {
-    onSubmit?: (e: FormEvent) => void;
+    onSubmit?: (e: React.FormEvent) => void;
 }
 
 export function Form(props: FormProps) {
+    const onSubmit = props.onSubmit;
+    
+    const handleSubmit = useCallback((event: React.FormEvent) => {
+        if (onSubmit) {
+            onSubmit(event);
+        }
+    }, [onSubmit]);
+    
     return (
         <div className="Form">
-            <form onSubmit={e => props.onSubmit && props.onSubmit(e)}>
+            <form onSubmit={handleSubmit}>
                 {props.children}
             </form>
         </div>

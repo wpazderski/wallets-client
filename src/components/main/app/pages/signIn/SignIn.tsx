@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import * as KvapiTypes from "@wpazderski/kvapi-types";
-import { FormEvent, useState } from "react";
+import { FormEvent, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { resolveServerError, UserSessionManager } from "../../../../../app";
@@ -35,7 +35,26 @@ export function SignIn() {
     const [userLoginError, setUserLoginError] = useState("");
     const [userPasswordError, setUserPasswordError] = useState("");
     
-    const handleSubmit = async (e: FormEvent) => {
+    const validateForm = useCallback(() => {
+        let hasErrors: boolean = false;
+        if (userLogin.length === 0) {
+            hasErrors = true;
+            setUserLoginError(t("page.signIn.form.errors.loginRequired"));
+        }
+        else {
+            setUserLoginError("");
+        }
+        if (userPassword.length === 0) {
+            hasErrors = true;
+            setUserPasswordError(t("page.signIn.form.errors.passwordRequired"));
+        }
+        else {
+            setUserPasswordError("");
+        }
+        return !hasErrors;
+    }, [t, userLogin.length, userPassword.length]);
+    
+    const handleSubmit = useCallback(async (e: FormEvent) => {
         if (isProcessing) {
             return;
         }
@@ -63,26 +82,15 @@ export function SignIn() {
             }));
             setIsProcessing(false);
         }
-    };
+    }, [api, dispatch, isProcessing, t, userLogin, userPassword, validateForm]);
     
-    const validateForm = () => {
-        let hasErrors: boolean = false;
-        if (userLogin.length === 0) {
-            hasErrors = true;
-            setUserLoginError(t("page.signIn.form.errors.loginRequired"));
-        }
-        else {
-            setUserLoginError("");
-        }
-        if (userPassword.length === 0) {
-            hasErrors = true;
-            setUserPasswordError(t("page.signIn.form.errors.passwordRequired"));
-        }
-        else {
-            setUserPasswordError("");
-        }
-        return !hasErrors;
-    };
+    const handleUserLoginChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setUserLogin(event.target.value); 
+    }, []);
+    
+    const handleUserPasswordChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setUserPassword(event.target.value); 
+    }, []);
     
     return (
         <Page className="SignIn">
@@ -90,10 +98,10 @@ export function SignIn() {
             <PageContent>
                 <Form onSubmit={handleSubmit}>
                     <FormField title={t("page.signIn.form.login")}>
-                        <TextField type="text" value={userLogin} onChange={e => setUserLogin(e.target.value)} error={!!userLoginError} helperText={userLoginError || " "} />
+                        <TextField type="text" value={userLogin} onChange={handleUserLoginChange} error={!!userLoginError} helperText={userLoginError || " "} />
                     </FormField>
                     <FormField title={t("page.signIn.form.password")}>
-                        <TextField type="password" value={userPassword} onChange={e => setUserPassword(e.target.value)} error={!!userPasswordError} helperText={userPasswordError || " "} />
+                        <TextField type="password" value={userPassword} onChange={handleUserPasswordChange} error={!!userPasswordError} helperText={userPasswordError || " "} />
                     </FormField>
                     <FormSeparator />
                     <FormField type="buttons">

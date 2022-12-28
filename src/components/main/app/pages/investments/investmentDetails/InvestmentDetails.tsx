@@ -4,12 +4,13 @@ import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import { useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useAppSelector, worldAreas } from "../../../../../../app/store";
 import { selectCurrencies } from "../../../../../../app/store/ExternalDataSlice";
-import { InvestmentId, selectInvestmentsList } from "../../../../../../app/store/InvestmentsSlice";
+import { InvestmentId, InvestmentTarget, selectInvestmentsList } from "../../../../../../app/store/InvestmentsSlice";
 import { InvestmentTypeSlug, selectInvestmentTypesList } from "../../../../../../app/store/InvestmentTypesSlice";
 import { Page } from "../../../page/Page";
 import { PageContent } from "../../../pageContent/PageContent";
@@ -38,19 +39,29 @@ export function InvestmentDetails() {
     const investmentType = useAppSelector(selectInvestmentTypesList).find(investmentType => investmentType.slug === investmentTypeSlug);
     const investment = useAppSelector(selectInvestmentsList).find(investment => investment.id === investmentId);
     
-    const handleEditClick = () => {
+    const handleEditClick = useCallback(() => {
         if (investmentType && investment) {
             navigate(getEditInvestmentUrl(investmentType.slug, investment.id));
         }
-    };
+    }, [investment, investmentType, navigate]);
     
-    const goToInvestmentsList = () => {
+    const goToInvestmentsList = useCallback(() => {
         navigate(getInvestmentsListUrl(investmentTypeSlug));
-    };
+    }, [investmentTypeSlug, navigate]);
     
-    if (investment && investmentType && investment.type !== investmentType.id) {
-        goToInvestmentsList();
-    }
+    useEffect(() => {
+        if (investment && investmentType && investment.type !== investmentType.id) {
+            goToInvestmentsList();
+        }
+    }, [goToInvestmentsList, investment, investmentType]);
+    
+    const targetCurrenciesLabelFormatter = useCallback((target: InvestmentTarget<string>) => {
+        return `${currencies.find(currency => currency.id === target.id)!.name} (${target.id})`;
+    }, [currencies]);
+    
+    const targetWorldAreasLabelFormatter = useCallback((target: InvestmentTarget<string>) => {
+        return worldAreas[target.id].name;
+    }, []);
     
     return (
         <Page className="InvestmentDetails">
@@ -63,7 +74,7 @@ export function InvestmentDetails() {
                     <div className="InvestmentDetails__views">
                         <Button
                             variant="contained"
-                            onClick={() => handleEditClick()}
+                            onClick={handleEditClick}
                             sx={{ minWidth: 45, padding: 1.5, marginBottom: 2, marginLeft: 2 }}
                         >
                             <FontAwesomeIcon icon={faSolid.faPen} />
@@ -84,7 +95,7 @@ export function InvestmentDetails() {
                                 investment={investment}
                                 targets={investment.targetCurrencies}
                                 title={t("common.investments.fields.targetCurrencies")}
-                                labelFormatter={target => `${currencies.find(currency => currency.id === target.id)!.name} (${target.id})`}
+                                labelFormatter={targetCurrenciesLabelFormatter}
                             />
                         )}
                         {investmentType.enableIndustries && investment.targetIndustries.length > 0 && (
@@ -99,7 +110,7 @@ export function InvestmentDetails() {
                                 investment={investment}
                                 targets={investment.targetWorldAreas}
                                 title={t("common.investments.fields.targetWorldAreas")}
-                                labelFormatter={target => worldAreas[target.id].name}
+                                labelFormatter={targetWorldAreasLabelFormatter}
                             />
                         )}
                     </div>

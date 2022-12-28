@@ -1,12 +1,12 @@
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import * as WalletsTypes from "@wpazderski/wallets-types";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { NumericFormat } from "react-number-format";
+import { NumberFormatValues, NumericFormat } from "react-number-format";
 
 import { getWeightUnits, InvestmentPurchase, InvestmentWeightUnit } from "../../../../../../../app/store/InvestmentsSlice";
 import { UserSettingsState } from "../../../../../../../app/store/UserSettingsSlice";
@@ -28,6 +28,9 @@ function getAvailablePurchaseTypes(): InvestmentPurchase["type"][] {
 }
 
 export function InvestmentPurchaseField(props: InvestmentPurchaseFieldProps) {
+    const createValidator = props.createValidator;
+    const onChange = props.onChange;
+    
     const { t } = useTranslation();
     const [purchaseType, setPurchaseType] = useState(props.value.type);
     const [currency, setCurrency] = useState(props.value.currency);
@@ -38,50 +41,69 @@ export function InvestmentPurchaseField(props: InvestmentPurchaseFieldProps) {
     const [weightUnitPrice, setWeightUnitPrice] = useState(props.value.type === "weight" ? props.value.price : 1000);
     const [weight, setWeight] = useState(props.value.type === "weight" ? props.value.weight : 1);
     
-    const onChange = props.onChange;
-    
-    const handleTypeChange = (type: InvestmentPurchase["type"]) => {
+    const handleTypeChange = useCallback((event: SelectChangeEvent<InvestmentPurchase["type"]>) => {
+        const type = event.target.value as InvestmentPurchase["type"];
         setPurchaseType(type);
         if (type === "integerUnits" && numUnits < 1) {
             setNumUnits(1);
         }
-    };
+    }, [numUnits]);
     
-    const handleCurrencyChange = (currencyId: WalletsTypes.data.currency.Id) => {
-        setCurrency(currencyId);
-    };
+    const handleCurrencyChange = useCallback((event: SelectChangeEvent<WalletsTypes.data.currency.Id>) => {
+        setCurrency(event.target.value as WalletsTypes.data.currency.Id);
+    }, []);
     
-    const handleAmountOfMoneyChange = (amountOfMoney: number) => {
-        setAmountOfMoney(amountOfMoney);
-    };
+    const handleAmountOfMoneyChange = useCallback((values: NumberFormatValues) => {
+        setAmountOfMoney(values.floatValue ?? 0.01);
+    }, []);
     
-    const handleNumUnitsChange = (numUnits: number) => {
-        setNumUnits(numUnits);
-    };
+    const isAmountOfMoneyAllowed = useCallback((values: NumberFormatValues) => {
+        return values.floatValue !== undefined && (values.floatValue >= 0.01 && values.floatValue <= 9999999999);
+    }, []);
     
-    const handleUnitPriceChange = (unitPrice: number) => {
-        setUnitPrice(unitPrice);
-    };
+    const handleNumUnitsChange = useCallback((values: NumberFormatValues) => {
+        setNumUnits(values.floatValue ?? (purchaseType === "decimalUnits" ? 0.000000001 : 1));
+    }, [purchaseType]);
     
-    const handleWeightUnitChange = (weightUnit: InvestmentWeightUnit) => {
-        setWeightUnit(weightUnit);
-    };
+    const isNumUnitsAllowed = useCallback((values: NumberFormatValues) => {
+        return values.floatValue !== undefined && (values.floatValue >= (purchaseType === "decimalUnits" ? 0.000000001 : 1) && values.floatValue <= 9999999999);
+    }, [purchaseType]);
     
-    const handleWeightUnitPriceChange = (weightUnitPrice: number) => {
-        setWeightUnitPrice(weightUnitPrice);
-    };
+    const handleUnitPriceChange = useCallback((values: NumberFormatValues) => {
+        setUnitPrice(values.floatValue ?? 0.01);
+    }, []);
     
-    const handleWeightChange = (weight: number) => {
-        setWeight(weight);
-    };
+    const isUnitPriceAllowed = useCallback((values: NumberFormatValues) => {
+        return values.floatValue !== undefined && (values.floatValue >= 0.01 && values.floatValue <= 9999999999);
+    }, []);
+    
+    const handleWeightUnitChange = useCallback((event: SelectChangeEvent<InvestmentWeightUnit>) => {
+        setWeightUnit(event.target.value as InvestmentWeightUnit);
+    }, []);
+    
+    const handleWeightUnitPriceChange = useCallback((values: NumberFormatValues) => {
+        setWeightUnitPrice(values.floatValue ?? 0.01);
+    }, []);
+    
+    const isWeightUnitPriceAllowed = useCallback((values: NumberFormatValues) => {
+        return values.floatValue !== undefined && (values.floatValue >= 0.01 && values.floatValue <= 9999999999);
+    }, []);
+    
+    const handleWeightChange = useCallback((values: NumberFormatValues) => {
+        setWeight(values.floatValue ?? 0.000000001);
+    }, []);
+    
+    const isWeightAllowed = useCallback((values: NumberFormatValues) => {
+        return values.floatValue !== undefined && (values.floatValue >= 0.000000001 && values.floatValue <= 9999999999);
+    }, []);
     
     const validateField = useCallback(() => {
         return true;
     }, []);
     
     useEffect(() => {
-        props.createValidator(validateField, "purchase");
-    }, [props, validateField]);
+        createValidator(validateField, "purchase");
+    }, [createValidator, validateField]);
     
     useEffect(() => {
         if (purchaseType === "anyAmountOfMoney") {
@@ -118,7 +140,7 @@ export function InvestmentPurchaseField(props: InvestmentPurchaseFieldProps) {
                     label={t("common.investments.fields.purchase.type")}
                     labelId="investment-purchase-type-label"
                     value={purchaseType}
-                    onChange={event => handleTypeChange(event.target.value as InvestmentPurchase["type"])}
+                    onChange={handleTypeChange}
                     sx={{ width: "100%" }}
                     disabled
                 >
@@ -131,7 +153,7 @@ export function InvestmentPurchaseField(props: InvestmentPurchaseFieldProps) {
                     label={t("common.investments.fields.purchase.currency")}
                     labelId="investment-purchase-currency-label"
                     value={currency}
-                    onChange={event => handleCurrencyChange(event.target.value as WalletsTypes.data.currency.Id)}
+                    onChange={handleCurrencyChange}
                     sx={{ width: "100%" }}
                 >
                     {props.userSettings.currencies.map(currency => <MenuItem key={currency.id} value={currency.id}>{currency.name} ({currency.id})</MenuItem>)}
@@ -145,12 +167,12 @@ export function InvestmentPurchaseField(props: InvestmentPurchaseFieldProps) {
                             decimalSeparator="."
                             suffix={" " + currency}
                             label={t("common.investments.fields.purchase.price")}
-                            isAllowed={values => values.floatValue !== undefined && (values.floatValue >= 0.01 && values.floatValue <= 9999999999)}
+                            isAllowed={isAmountOfMoneyAllowed}
                             decimalScale={2}
                             customInput={TextField}
                             allowNegative={false}
                             value={amountOfMoney}
-                            onValueChange={value => handleAmountOfMoneyChange(value.floatValue ?? 0.01)}
+                            onValueChange={handleAmountOfMoneyChange}
                         />
                     </FormControl>
                 </>
@@ -162,12 +184,12 @@ export function InvestmentPurchaseField(props: InvestmentPurchaseFieldProps) {
                             thousandSeparator=" "
                             decimalSeparator="."
                             label={t("common.investments.fields.purchase.numUnits")}
-                            isAllowed={values => values.floatValue !== undefined && (values.floatValue >= (purchaseType === "decimalUnits" ? 0.000000001 : 1) && values.floatValue <= 9999999999)}
+                            isAllowed={isNumUnitsAllowed}
                             decimalScale={purchaseType === "decimalUnits" ? 9 : 0}
                             customInput={TextField}
                             allowNegative={false}
                             value={numUnits}
-                            onValueChange={value => handleNumUnitsChange(value.floatValue ?? (purchaseType === "decimalUnits" ? 0.000000001 : 1))}
+                            onValueChange={handleNumUnitsChange}
                         />
                     </FormControl>
                     <FormControl>
@@ -176,12 +198,12 @@ export function InvestmentPurchaseField(props: InvestmentPurchaseFieldProps) {
                             decimalSeparator="."
                             suffix={" " + currency}
                             label={t("common.investments.fields.purchase.unitPrice")}
-                            isAllowed={values => values.floatValue !== undefined && (values.floatValue >= 0.01 && values.floatValue <= 9999999999)}
+                            isAllowed={isUnitPriceAllowed}
                             decimalScale={2}
                             customInput={TextField}
                             allowNegative={false}
                             value={unitPrice}
-                            onValueChange={value => handleUnitPriceChange(value.floatValue ?? 0.01)}
+                            onValueChange={handleUnitPriceChange}
                         />
                     </FormControl>
                 </>
@@ -194,7 +216,7 @@ export function InvestmentPurchaseField(props: InvestmentPurchaseFieldProps) {
                             label={t("common.investments.fields.purchase.weightUnit")}
                             labelId="investment-purchase-weightUnit-label"
                             value={weightUnit}
-                            onChange={event => handleWeightUnitChange(event.target.value as InvestmentWeightUnit)}
+                            onChange={handleWeightUnitChange}
                             sx={{ width: "100%" }}
                         >
                             {getWeightUnits().map(unit => <MenuItem key={unit} value={unit}>{unit}</MenuItem>)}
@@ -206,12 +228,12 @@ export function InvestmentPurchaseField(props: InvestmentPurchaseFieldProps) {
                             decimalSeparator="."
                             suffix={" " + currency}
                             label={t("common.investments.fields.purchase.weightUnitPrice", { unit: weightUnit })}
-                            isAllowed={values => values.floatValue !== undefined && (values.floatValue >= 0.01 && values.floatValue <= 9999999999)}
+                            isAllowed={isWeightUnitPriceAllowed}
                             decimalScale={2}
                             customInput={TextField}
                             allowNegative={false}
                             value={weightUnitPrice}
-                            onValueChange={value => handleWeightUnitPriceChange(value.floatValue ?? 0.01)}
+                            onValueChange={handleWeightUnitPriceChange}
                         />
                     </FormControl>
                     <FormControl>
@@ -219,12 +241,12 @@ export function InvestmentPurchaseField(props: InvestmentPurchaseFieldProps) {
                             thousandSeparator=" "
                             decimalSeparator="."
                             label={t("common.investments.fields.purchase.weight")}
-                            isAllowed={values => values.floatValue !== undefined && (values.floatValue >= 0.000000001 && values.floatValue <= 9999999999)}
+                            isAllowed={isWeightAllowed}
                             decimalScale={9}
                             customInput={TextField}
                             allowNegative={false}
                             value={weight}
-                            onValueChange={value => handleWeightChange(value.floatValue ?? 0.000000001)}
+                            onValueChange={handleWeightChange}
                         />
                     </FormControl>
                 </>

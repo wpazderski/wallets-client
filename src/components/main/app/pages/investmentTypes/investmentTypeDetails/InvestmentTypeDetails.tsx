@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Switch from "@mui/material/Switch";
+import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -26,9 +27,9 @@ export function InvestmentTypeDetails() {
     const navigate = useNavigate();
     const investmentType = useAppSelector(selectInvestmentTypesList).find(investmentType => investmentType.id === investmentTypeId);
     
-    const handleEditClick = () => {
+    const handleEditClick = useCallback(() => {
         navigate(getEditInvestmentTypeUrl(investmentTypeId));
-    };
+    }, [navigate, investmentTypeId]);
     
     return (
         <Page className="InvestmentTypeDetails">
@@ -38,7 +39,7 @@ export function InvestmentTypeDetails() {
                     <>
                         <Button
                             variant="contained"
-                            onClick={() => handleEditClick()}
+                            onClick={handleEditClick}
                             sx={{ minWidth: 45, padding: 1.5, marginBottom: 2, marginLeft: 2 }}
                         >
                             <FontAwesomeIcon icon={faSolid.faPen} />

@@ -25,8 +25,6 @@ export function SummaryByTargetIndustryTab(props: SummaryByTargetIndustryTabProp
     const externalData = useAppSelector(selectExternalData);
     const userSettings = useAppSelector(selectUserSettings);
     
-    const includedWallets = props.includedWallets;
-    
     const industryIds = useMemo(() => {
         const industryIds = new Set();
         for (const investment of investments) {
@@ -41,7 +39,7 @@ export function SummaryByTargetIndustryTab(props: SummaryByTargetIndustryTabProp
         return industryIds.map(industryId => {
             const value = investments
                 .map(investment => {
-                    if (!includedWallets.includes(investment.walletId)) {
+                    if (!props.includedWallets.includes(investment.walletId)) {
                         return 0;
                     }
                     const target = investment.targetIndustries.find(targetIndustry => targetIndustry.id === industryId);
@@ -59,7 +57,7 @@ export function SummaryByTargetIndustryTab(props: SummaryByTargetIndustryTabProp
                 value,
             };
         }).filter(entry => !!entry) as Entry[];
-    }, [investments, externalData, userSettings, includedWallets, industryIds]);
+    }, [investments, externalData, userSettings, props.includedWallets, industryIds]);
     
     return (
         <div className="SummaryByTargetIndustryTab">

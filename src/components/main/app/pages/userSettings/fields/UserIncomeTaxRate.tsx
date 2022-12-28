@@ -1,8 +1,8 @@
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { NumericFormat } from "react-number-format";
+import { NumberFormatValues, NumericFormat } from "react-number-format";
 
 import { IncomeTaxRate, UserSettingsState } from "../../../../../../app/store/UserSettingsSlice";
 import { FormField } from "../../../../common/formField/FormField";
@@ -17,20 +17,27 @@ export interface UserIncomeTaxRateProps {
 }
 
 export function UserIncomeTaxRate(props: UserIncomeTaxRateProps) {
+    const updateSettings = props.updateSettings;
+    
     const { t } = useTranslation();
     const [incomeTaxRate, setIncomeTaxRate] = useState(props.incomeTaxRate);
     
-    const handleIncomeTaxRateChange = (value: IncomeTaxRate) => {
-        setIncomeTaxRate(value);
-    };
+    const isIncomeTaxRateAllowed = useCallback((values: NumberFormatValues) => {
+        return values.floatValue !== undefined && (values.floatValue >= 0 && values.floatValue <= 100);
+    }, []);
     
-    const handleIncomeTaxRateBlur = () => {
+    const handleIncomeTaxRateChange = useCallback((values: NumberFormatValues) => {
+        const value = (values.floatValue ?? 0) as IncomeTaxRate;
+        setIncomeTaxRate(value);
+    }, []);
+    
+    const handleIncomeTaxRateBlur = useCallback(() => {
         if (props.incomeTaxRate !== incomeTaxRate) {
-            props.updateSettings(settings => {
+            updateSettings(settings => {
                 settings.incomeTaxRate = incomeTaxRate;
             });
         }
-    };
+    }, [incomeTaxRate, props.incomeTaxRate, updateSettings]);
     
     return (
         <FormField className="UserSettings__IncomeTaxRate" title={t("page.userSettings.form.incomeTaxRate.name")}>
@@ -40,13 +47,13 @@ export function UserIncomeTaxRate(props: UserIncomeTaxRateProps) {
                     decimalSeparator="."
                     suffix={"%"}
                     label={t("page.userSettings.form.incomeTaxRate.name")}
-                    isAllowed={values => values.floatValue !== undefined && (values.floatValue >= 0 && values.floatValue <= 100)}
+                    isAllowed={isIncomeTaxRateAllowed}
                     decimalScale={9}
                     customInput={TextField}
                     allowNegative={false}
                     value={incomeTaxRate}
-                    onValueChange={value => handleIncomeTaxRateChange((value.floatValue ?? 0) as IncomeTaxRate)}
-                    onBlur={() => handleIncomeTaxRateBlur()}
+                    onValueChange={handleIncomeTaxRateChange}
+                    onBlur={handleIncomeTaxRateBlur}
                 />
             </FormControl>
         </FormField>

@@ -16,18 +16,19 @@ export interface InvestmentNameFieldProps {
 }
 
 export function InvestmentNameField(props: InvestmentNameFieldProps) {
+    const createValidator = props.createValidator;
+    const onChange = props.onChange;
+    
     const { t } = useTranslation();
     const [value, setValue] = useState(props.value);
     const [fieldError, setFieldError] = useState("");
     const [touchedField, setTouchedField] = useState(false);
     
-    const createValidator = props.createValidator;
-    const onChange = props.onChange;
-    
-    const handleFieldChange = (value: InvestmentName) => {
+    const handleFieldChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value as InvestmentName;
         setValue(value);
         setTouchedField(true);
-    };
+    }, []);
     
     const validateField = useCallback(() => {
         if (value.length === 0) {
@@ -46,10 +47,11 @@ export function InvestmentNameField(props: InvestmentNameFieldProps) {
         }
     }, [value, touchedField, validateField]);
     
-    const handleFieldBlur = (value: InvestmentName) => {
+    const handleFieldBlur = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const value = event.target.value as InvestmentName;
         setValue(value.trim() as InvestmentName);
         setTouchedField(true);
-    };
+    }, []);
     
     useEffect(() => {
         createValidator(validateField, "name");
@@ -63,8 +65,8 @@ export function InvestmentNameField(props: InvestmentNameFieldProps) {
         <FormField title={t("common.investments.fields.name")}>
             <TextField
                 value={value}
-                onChange={e => handleFieldChange(e.target.value as InvestmentName)}
-                onBlur={e => handleFieldBlur(e.target.value as InvestmentName)}
+                onChange={handleFieldChange}
+                onBlur={handleFieldBlur}
                 error={!!fieldError}
                 helperText={fieldError || " "}
             />

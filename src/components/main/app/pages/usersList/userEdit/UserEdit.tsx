@@ -6,7 +6,7 @@ import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import * as KvapiTypes from "@wpazderski/kvapi-types";
 import { useCallback, useEffect, useState } from "react";
@@ -84,14 +84,11 @@ export function UserEdit() {
         });
     }, [api, dispatch, goToUsersList, t, userId]);
     
-    const handleUserRoleChange = (role: KvapiTypes.data.user.Role) => {
-        setUserRole(role);
-    };
+    const handleUserRoleChange = useCallback((event: SelectChangeEvent<KvapiTypes.data.user.Role>) => {
+        setUserRole(event.target.value as KvapiTypes.data.user.Role);
+    }, []);
     
-    const handleUserLoginChange = (login: KvapiTypes.data.user.Login) => {
-        setUserLogin(login);
-    };
-    const validateUserLogin = () => {
+    const validateUserLogin = useCallback(() => {
         if (userLogin.trim().length === 0) {
             setUserLoginError(t("page.userCreate.form.errors.loginRequired"));
             return false;
@@ -100,13 +97,24 @@ export function UserEdit() {
             setUserLoginError("");
             return true;
         }
-    };
-    const handleUserLoginBlur = (login: KvapiTypes.data.user.Login) => {
-        setUserLogin(login.trim() as KvapiTypes.data.user.Login);
-        validateUserLogin();
-    };
+    }, [t, userLogin]);
     
-    const handleSaveChangesClick = async () => {
+    const handleUserLoginChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setUserLogin(event.target.value as KvapiTypes.data.user.Login);
+    }, []);
+    
+    const handleUserLoginBlur = useCallback((event: React.FocusEvent<HTMLInputElement>) => {
+        setUserLogin(event.target.value.trim() as KvapiTypes.data.user.Login);
+        validateUserLogin();
+    }, [validateUserLogin]);
+    
+    const validateForm = useCallback(() => {
+        let isOk: boolean = true;
+        isOk = validateUserLogin() && isOk;
+        return isOk;
+    }, [validateUserLogin]);
+    
+    const handleSaveChangesClick = useCallback(async () => {
         if (!validateForm()) {
             return;
         }
@@ -135,17 +143,11 @@ export function UserEdit() {
         finally {
             setIsProcessing(false);
         }
-    };
+    }, [api, dispatch, goToUsersList, t, userId, userLogin, userRole, validateForm]);
     
-    const handleCancelClick = () => {
+    const handleCancelClick = useCallback(() => {
         goToUsersList();
-    };
-    
-    const validateForm = () => {
-        let isOk: boolean = true;
-        isOk = validateUserLogin() && isOk;
-        return isOk;
-    };
+    }, [goToUsersList]);
     
     return (
         <Page className="UserEdit">
@@ -157,8 +159,8 @@ export function UserEdit() {
                             <FormControl>
                                 <TextField
                                     value={userLogin}
-                                    onChange={event => handleUserLoginChange(event.target.value as KvapiTypes.data.user.Login)}
-                                    onBlur={event => handleUserLoginBlur(event.target.value as KvapiTypes.data.user.Login)}
+                                    onChange={handleUserLoginChange}
+                                    onBlur={handleUserLoginBlur}
                                     error={!!userLoginError}
                                     helperText={userLoginError || " "}
                                 />
@@ -168,7 +170,7 @@ export function UserEdit() {
                             <FormControl>
                                 <Select
                                     value={userRole}
-                                    onChange={event => handleUserRoleChange(event.target.value as KvapiTypes.data.user.Role)}
+                                    onChange={handleUserRoleChange}
                                     disabled={userId === signedInUserId}
                                 >
                                     {getAvailableUserRoles().map(userRole => <MenuItem key={userRole} value={userRole}>{t(`page.userEdit.form.role.list.${userRole}`)}</MenuItem>)}
@@ -180,13 +182,13 @@ export function UserEdit() {
                             <Button
                                 variant="contained"
                                 startIcon={<FontAwesomeIcon icon={faSolid.faSave} />}
-                                onClick={() => handleSaveChangesClick()}
+                                onClick={handleSaveChangesClick}
                             >
                                 {t("common.buttons.save")}
                             </Button>
                             <Button
                                 variant="outlined"
-                                onClick={() => handleCancelClick()}
+                                onClick={handleCancelClick}
                             >
                                 {t("common.buttons.cancel")}
                             </Button>

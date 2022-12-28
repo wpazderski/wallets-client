@@ -7,10 +7,10 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import ListItemText from "@mui/material/ListItemText";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useAppSelector } from "../../../../../app/store";
@@ -62,13 +62,17 @@ export function Summary() {
         });
     }, [investments, externalData, userSettings]);
     
-    const handleActiveWalletsChange = (value: WalletId[]) => {
-        setIncludedWalletIds(value);
-    };
-    
-    const handleActiveTabIdChange = (value: TabId) => {
+    const handleActiveTabIdChange = useCallback((_event: React.SyntheticEvent, value: TabId) => {
         setActiveTabId(value);
-    };
+    }, []);
+    
+    const handleActiveWalletsChange = useCallback((event: SelectChangeEvent<WalletId[]>) => {
+        setIncludedWalletIds(event.target.value as WalletId[]);
+    }, []);
+    
+    const renderWalletsSelectValue = useCallback((walletIds: WalletId[]) => {
+        return wallets.filter(wallet => walletIds.includes(wallet.id)).map(wallet => (wallet.isPredefined ? t(wallet.name as any) : wallet.name)).join(", ");
+    }, [t, wallets]);
     
     return (
         <Page className="Summary">
@@ -78,7 +82,7 @@ export function Summary() {
                     value={activeTabId}
                     variant="scrollable"
                     scrollButtons="auto"
-                    onChange={(_, value) => handleActiveTabIdChange(value)}
+                    onChange={handleActiveTabIdChange}
                     className="Summary__tabs"
                 >
                     <Tab value="byWallet" label={t("page.summary.tabs.byWallet")} icon={<FontAwesomeIcon icon={faSolid.faWallet} />} />
@@ -96,8 +100,8 @@ export function Summary() {
                             labelId="summary-wallets-filter-label"
                             value={includedWalletIds}
                             multiple
-                            renderValue={walletIds => wallets.filter(wallet => walletIds.includes(wallet.id)).map(wallet => (wallet.isPredefined ? t(wallet.name as any) : wallet.name)).join(", ")}
-                            onChange={event => handleActiveWalletsChange(event.target.value as WalletId[])}
+                            renderValue={renderWalletsSelectValue}
+                            onChange={handleActiveWalletsChange}
                         >
                             {wallets.map(filter => (
                                 <MenuItem key={filter.id} value={filter.id}>

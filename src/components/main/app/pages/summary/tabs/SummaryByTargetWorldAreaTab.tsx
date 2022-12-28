@@ -1,8 +1,8 @@
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
-import { useMemo, useState } from "react";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useAppSelector, WorldAreaData, worldAreas } from "../../../../../../app/store";
@@ -45,15 +45,15 @@ export function SummaryByTargetWorldAreaTab(props: SummaryByTargetWorldAreaTabPr
     const [wholeWorldStrategy, setWholeWorldStrategy] = useState<CombinedWorldAreasStrategy>("showSeparate");
     const [continentsStrategy, setContinentsStrategy] = useState<CombinedWorldAreasStrategy>("showSeparate");
     
-    const includedWallets = props.includedWallets;
-    
-    const handleWholeWorldStrategyChange = (strategy: CombinedWorldAreasStrategy) => {
+    const handleWholeWorldStrategyChange = useCallback((event: SelectChangeEvent<CombinedWorldAreasStrategy>) => {
+        const strategy = event.target.value as CombinedWorldAreasStrategy;
         setWholeWorldStrategy(strategy);
-    };
+    }, []);
     
-    const handleContinentsStrategyChange = (strategy: CombinedWorldAreasStrategy) => {
+    const handleContinentsStrategyChange = useCallback((event: SelectChangeEvent<CombinedWorldAreasStrategy>) => {
+        const strategy = event.target.value as CombinedWorldAreasStrategy;
         setContinentsStrategy(strategy);
-    };
+    }, []);
     
     const worldAreaIds = useMemo(() => {
         const worldAreaIds = new Set();
@@ -69,7 +69,7 @@ export function SummaryByTargetWorldAreaTab(props: SummaryByTargetWorldAreaTabPr
         return worldAreaIds.map(worldAreaId => {
             const value = investments
                 .map(investment => {
-                    if (!includedWallets.includes(investment.walletId)) {
+                    if (!props.includedWallets.includes(investment.walletId)) {
                         return 0;
                     }
                     const target = investment.targetWorldAreas.find(targetWorldArea => targetWorldArea.id === worldAreaId);
@@ -95,7 +95,7 @@ export function SummaryByTargetWorldAreaTab(props: SummaryByTargetWorldAreaTabPr
                 },
             };
         }).filter(entry => !!entry) as RawEntry[];
-    }, [investments, externalData, userSettings, includedWallets, worldAreaIds]);
+    }, [investments, externalData, userSettings, props.includedWallets, worldAreaIds]);
     
     const entries: Entry[] = useMemo(() => {
         const entries: Entry[] = [];
@@ -162,7 +162,7 @@ export function SummaryByTargetWorldAreaTab(props: SummaryByTargetWorldAreaTabPr
                         label={t("page.summary.worldAreas.combinedWorldAreasStrategies.wholeWorld")}
                         labelId="summary-worldAreas-whole-world-strategy-label"
                         value={wholeWorldStrategy}
-                        onChange={event => handleWholeWorldStrategyChange(event.target.value as CombinedWorldAreasStrategy)}
+                        onChange={handleWholeWorldStrategyChange}
                     >
                         {getCombinedWorldAreasStrategies().map(strategy => (
                             <MenuItem key={strategy} value={strategy}>
@@ -177,7 +177,7 @@ export function SummaryByTargetWorldAreaTab(props: SummaryByTargetWorldAreaTabPr
                         label={t("page.summary.worldAreas.combinedWorldAreasStrategies.continents")}
                         labelId="summary-worldAreas-continents-strategy-label"
                         value={continentsStrategy}
-                        onChange={event => handleContinentsStrategyChange(event.target.value as CombinedWorldAreasStrategy)}
+                        onChange={handleContinentsStrategyChange}
                     >
                         {getCombinedWorldAreasStrategies().map(strategy => (
                             <MenuItem key={strategy} value={strategy}>

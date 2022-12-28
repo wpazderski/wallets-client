@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import { useMemo } from "react";
+import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
@@ -47,20 +48,20 @@ export function WalletDetails() {
         return obj;
     }, [investmentTypes]);
     
-    const handleEditInvestmentClick = (investment: Investment) => {
-        const slug = investmentTypesSlugs[investment.type];
-        if (!slug) {
-            return;
-        }
-        navigate(getEditInvestmentUrl(slug, investment.id));
-    };
-    
     const investmentsEx = useMemo(() => {
         return investments.map(investment => ({
             ...investment,
             currentValue: new Calculator(investment, externalData, userSettings).calculate(),
         })) as InvestmentEx[];
     }, [investments, externalData, userSettings]);
+    
+    const handleEditInvestmentClick = useCallback((investment: Investment) => {
+        const slug = investmentTypesSlugs[investment.type];
+        if (!slug) {
+            return;
+        }
+        navigate(getEditInvestmentUrl(slug, investment.id));
+    }, [investmentTypesSlugs, navigate]);
     
     return (
         <Page className="WalletDetails">
@@ -106,13 +107,7 @@ export function WalletDetails() {
                                             </td>
                                             <td className="centered">
                                                 {investmentTypesSlugs[investment.type] && (
-                                                    <Button
-                                                        variant="contained"
-                                                        onClick={() => handleEditInvestmentClick(investment)}
-                                                        sx={{ minWidth: 45, padding: 1.5 }}
-                                                    >
-                                                        <FontAwesomeIcon icon={faSolid.faPen} />
-                                                    </Button>
+                                                    <InvestmentEditButton investment={investment} onEditInvestmentClick={handleEditInvestmentClick} />
                                                 )}
                                             </td>
                                         </tr>
@@ -137,5 +132,28 @@ export function WalletDetails() {
                 )}
             </PageContent>
         </Page>
+    );
+}
+
+interface InvestmentEditButtonProps {
+    investment: InvestmentEx;
+    onEditInvestmentClick: (investment: InvestmentEx) => void;
+}
+
+function InvestmentEditButton(props: InvestmentEditButtonProps) {
+    const onEditInvestmentClick = props.onEditInvestmentClick;
+    
+    const handleEditInvestmentClick = useCallback(() => {
+        onEditInvestmentClick(props.investment);
+    }, [onEditInvestmentClick, props.investment]);
+    
+    return (
+        <Button
+            variant="contained"
+            onClick={handleEditInvestmentClick}
+            sx={{ minWidth: 45, padding: 1.5 }}
+        >
+            <FontAwesomeIcon icon={faSolid.faPen} />
+        </Button>
     );
 }

@@ -5,7 +5,7 @@ import TextField from "@mui/material/TextField";
 import * as WalletsTypes from "@wpazderski/wallets-types";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { NumericFormat } from "react-number-format";
+import { NumberFormatValues, NumericFormat } from "react-number-format";
 
 import {
     InvestmentCancellationPolicy,
@@ -28,6 +28,9 @@ export interface InvestmentCancellationPolicyProps<T extends CancellationPolicy>
 }
 
 export function InvestmentCancellationPolicyField<T extends CancellationPolicy>(props: InvestmentCancellationPolicyProps<T>) {
+    const createValidator = props.createValidator;
+    const onChange = props.onChange;
+    
     const { t } = useTranslation();
     const [fixedPenalty, setFixedPenalty] = useState(props.value.fixedPenalty);
     const [percentOfTotalInterest, setPercentOfTotalInterest] = useState(props.value.percentOfTotalInterest);
@@ -35,36 +38,47 @@ export function InvestmentCancellationPolicyField<T extends CancellationPolicy>(
     const [limitedToTotalInterest, setLimitedToTotalInterest] = useState(props.value.limitedToTotalInterest);
     const [limitedToInterestPeriodInterest, setLimitedToInterestPeriodInterest] = useState("limitedToInterestPeriodInterest" in props.value ? props.value.limitedToInterestPeriodInterest : false);
     
-    const onChange = props.onChange;
     const cancellationPolicyType = "percentOfInterestPeriodInterest" in props.value ? "interestPeriod" : "total";
     
-    const handleFixedPenaltyChange = (fixedPenalty: number) => {
-        setFixedPenalty(fixedPenalty);
-    };
+    const handleFixedPenaltyChange = useCallback((values: NumberFormatValues) => {
+        setFixedPenalty(values.floatValue ?? 0.00);
+    }, []);
     
-    const handlePercentOfTotalInterestChange = (percentOfTotalInterest: number) => {
-        setPercentOfTotalInterest(percentOfTotalInterest);
-    };
+    const handlePercentOfTotalInterestChange = useCallback((values: NumberFormatValues) => {
+        setPercentOfTotalInterest(values.floatValue ?? 0.);
+    }, []);
     
-    const handlePercentOfInterestPeriodInterestChange = (percentOfInterestPeriodInterest: number) => {
-        setPercentOfInterestPeriodInterest(percentOfInterestPeriodInterest);
-    };
+    const handlePercentOfInterestPeriodInterestChange = useCallback((values: NumberFormatValues) => {
+        setPercentOfInterestPeriodInterest(values.floatValue ?? 0.00);
+    }, []);
     
-    const handleLimitedToTotalInterestChange = (limitedToTotalInterest: boolean) => {
-        setLimitedToTotalInterest(limitedToTotalInterest);
-    };
+    const handleLimitedToTotalInterestChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setLimitedToTotalInterest(event.target.checked);
+    }, []);
     
-    const handleLimitedToInterestPeriodInterestChange = (limitedToInterestPeriodInterest: boolean) => {
-        setLimitedToInterestPeriodInterest(limitedToInterestPeriodInterest);
-    };
+    const handleLimitedToInterestPeriodInterestChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setLimitedToInterestPeriodInterest(event.target.checked);
+    }, []);
     
     const validateField = useCallback(() => {
         return true;
     }, []);
     
+    const isFixedPenaltyAllowed = useCallback((values: NumberFormatValues) => {
+        return values.floatValue !== undefined && (values.floatValue >= 0.00 && values.floatValue <= 9999999999);
+    }, []);
+    
+    const isPercentOfTotalInterestAllowed = useCallback((values: NumberFormatValues) => {
+        return values.floatValue !== undefined && (values.floatValue >= 0.00 && values.floatValue <= 1000);
+    }, []);
+    
+    const isPercentOfInterestPeriodInterestAllowed = useCallback((values: NumberFormatValues) => {
+        return values.floatValue !== undefined && (values.floatValue >= 0.00 && values.floatValue <= 1000);
+    }, []);
+    
     useEffect(() => {
-        props.createValidator(validateField, "cancellationPolicy");
-    }, [props, validateField]);
+        createValidator(validateField, "cancellationPolicy");
+    }, [createValidator, validateField]);
     
     useEffect(() => {
         if (cancellationPolicyType === "total") {
@@ -93,12 +107,12 @@ export function InvestmentCancellationPolicyField<T extends CancellationPolicy>(
                     decimalSeparator="."
                     suffix={" " + props.currency}
                     label={t("common.investments.fields.cancellationPolicy.fixedPenalty")}
-                    isAllowed={values => values.floatValue !== undefined && (values.floatValue >= 0.00 && values.floatValue <= 9999999999)}
+                    isAllowed={isFixedPenaltyAllowed}
                     decimalScale={2}
                     customInput={TextField}
                     allowNegative={false}
                     value={fixedPenalty}
-                    onValueChange={value => handleFixedPenaltyChange(value.floatValue ?? 0.00)}
+                    onValueChange={handleFixedPenaltyChange}
                 />
             </FormControl>
             <FormControl>
@@ -107,12 +121,12 @@ export function InvestmentCancellationPolicyField<T extends CancellationPolicy>(
                     decimalSeparator="."
                     suffix={"%"}
                     label={t("common.investments.fields.cancellationPolicy.percentOfTotalInterest")}
-                    isAllowed={values => values.floatValue !== undefined && (values.floatValue >= 0.00 && values.floatValue <= 1000)}
+                    isAllowed={isPercentOfTotalInterestAllowed}
                     decimalScale={5}
                     customInput={TextField}
                     allowNegative={false}
                     value={percentOfTotalInterest}
-                    onValueChange={value => handlePercentOfTotalInterestChange(value.floatValue ?? 0.00)}
+                    onValueChange={handlePercentOfTotalInterestChange}
                 />
             </FormControl>
             {cancellationPolicyType === "interestPeriod" && (
@@ -122,12 +136,12 @@ export function InvestmentCancellationPolicyField<T extends CancellationPolicy>(
                         decimalSeparator="."
                         suffix={"%"}
                         label={t("common.investments.fields.cancellationPolicy.percentOfInterestPeriodInterest")}
-                        isAllowed={values => values.floatValue !== undefined && (values.floatValue >= 0.00 && values.floatValue <= 1000)}
+                        isAllowed={isPercentOfInterestPeriodInterestAllowed}
                         decimalScale={5}
                         customInput={TextField}
                         allowNegative={false}
                         value={percentOfInterestPeriodInterest}
-                        onValueChange={value => handlePercentOfInterestPeriodInterestChange(value.floatValue ?? 0.00)}
+                        onValueChange={handlePercentOfInterestPeriodInterestChange}
                     />
                 </FormControl>
             )}
@@ -138,7 +152,7 @@ export function InvestmentCancellationPolicyField<T extends CancellationPolicy>(
                     control={
                         <Switch
                             checked={limitedToTotalInterest}
-                            onChange={event => handleLimitedToTotalInterestChange(event.target.checked)}
+                            onChange={handleLimitedToTotalInterestChange}
                         />
                     }
                 />
@@ -151,7 +165,7 @@ export function InvestmentCancellationPolicyField<T extends CancellationPolicy>(
                         control={
                             <Switch
                                 checked={limitedToInterestPeriodInterest}
-                                onChange={event => handleLimitedToInterestPeriodInterestChange(event.target.checked)}
+                                onChange={handleLimitedToInterestPeriodInterestChange}
                             />
                         }
                     />

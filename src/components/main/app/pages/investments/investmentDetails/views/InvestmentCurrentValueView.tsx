@@ -22,10 +22,9 @@ export function InvestmentCurrentValueView(props: InvestmentCurrentValueViewProp
     const externalData = useAppSelector(selectExternalData);
     const userSettings = useAppSelector(selectUserSettings);
     
-    const investment = props.investment;
     const currentValue = useMemo(() => {
-        return new Calculator(investment, externalData, userSettings).calculate();
-    }, [investment, externalData, userSettings]);
+        return new Calculator(props.investment, externalData, userSettings).calculate();
+    }, [props.investment, externalData, userSettings]);
     
     return (
         <FormField title={t("common.investments.fields.currentValue")} className="FormField--full-width">

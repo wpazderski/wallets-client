@@ -1,9 +1,9 @@
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 import * as WalletsTypes from "@wpazderski/wallets-types";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { NumericFormat } from "react-number-format";
+import { NumberFormatValues, NumericFormat } from "react-number-format";
 
 import { IncomeTaxAllowance, UserSettingsState } from "../../../../../../app/store/UserSettingsSlice";
 import { FormField } from "../../../../common/formField/FormField";
@@ -19,20 +19,27 @@ export interface UserIncomeTaxAllowanceProps {
 }
 
 export function UserIncomeTaxAllowance(props: UserIncomeTaxAllowanceProps) {
+    const updateSettings = props.updateSettings;
+    
     const { t } = useTranslation();
     const [incomeTaxAllowance, setIncomeTaxAllowance] = useState(props.incomeTaxAllowance);
     
-    const handleIncomeTaxAllowanceChange = (value: IncomeTaxAllowance) => {
-        setIncomeTaxAllowance(value);
-    };
+    const isIncomeTaxAllowanceAllowed = useCallback((values: NumberFormatValues) => {
+        return values.floatValue !== undefined && (values.floatValue >= 0 && values.floatValue <= 9999999999);
+    }, []);
     
-    const handleIncomeTaxAllowanceBlur = () => {
+    const handleIncomeTaxAllowanceChange = useCallback((values: NumberFormatValues) => {
+        const value = (values.floatValue ?? 0) as IncomeTaxAllowance;
+        setIncomeTaxAllowance(value);
+    }, []);
+    
+    const handleIncomeTaxAllowanceBlur = useCallback(() => {
         if (props.incomeTaxAllowance !== incomeTaxAllowance) {
-            props.updateSettings(settings => {
+            updateSettings(settings => {
                 settings.incomeTaxAllowance = incomeTaxAllowance;
             });
         }
-    };
+    }, [incomeTaxAllowance, props.incomeTaxAllowance, updateSettings]);
     
     return (
         <FormField className="UserSettings__IncomeTaxAllowance" title={t("page.userSettings.form.incomeTaxAllowance.name")}>
@@ -42,13 +49,13 @@ export function UserIncomeTaxAllowance(props: UserIncomeTaxAllowanceProps) {
                     decimalSeparator="."
                     suffix={" " + props.currency}
                     label={t("page.userSettings.form.incomeTaxAllowance.name")}
-                    isAllowed={values => values.floatValue !== undefined && (values.floatValue >= 0 && values.floatValue <= 9999999999)}
+                    isAllowed={isIncomeTaxAllowanceAllowed}
                     decimalScale={2}
                     customInput={TextField}
                     allowNegative={false}
                     value={incomeTaxAllowance}
-                    onValueChange={value => handleIncomeTaxAllowanceChange((value.floatValue ?? 0) as IncomeTaxAllowance)}
-                    onBlur={() => handleIncomeTaxAllowanceBlur()}
+                    onValueChange={handleIncomeTaxAllowanceChange}
+                    onBlur={handleIncomeTaxAllowanceBlur}
                 />
             </FormControl>
         </FormField>

@@ -14,6 +14,10 @@ export interface SidebarNavLinkProps extends LinkProps {
 
 export function SidebarNavLink({ children, to, matchWholePath, ...props }: SidebarNavLinkProps) {
     const onClick = props.onClick;
+    
+    const resolvedPath = useResolvedPath(to);
+    const pathMatch = useMatch({ path: resolvedPath.pathname, end: !!matchWholePath });
+    
     const handleClick = useCallback((e: React.MouseEvent) => {
         if (onClick) {
             e.stopPropagation();
@@ -21,8 +25,6 @@ export function SidebarNavLink({ children, to, matchWholePath, ...props }: Sideb
             onClick();
         }
     }, [onClick]);
-    const resolved = useResolvedPath(to);
-    const match = useMatch({ path: resolved.pathname, end: !!matchWholePath });
     
     return (
         <div>
@@ -30,7 +32,7 @@ export function SidebarNavLink({ children, to, matchWholePath, ...props }: Sideb
                 to={to}
                 {...props}
                 onClick={handleClick}
-                className={`SidebarNavLink ${match ? "SidebarNavLink--active" : "SidebarNavLink--inactive"}`}
+                className={`SidebarNavLink ${pathMatch ? "SidebarNavLink--active" : "SidebarNavLink--inactive"}`}
             >
                 {children}
             </Link>

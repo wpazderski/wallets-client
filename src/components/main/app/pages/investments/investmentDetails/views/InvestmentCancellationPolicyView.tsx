@@ -19,11 +19,10 @@ export interface InvestmentCancellationPolicyViewProps {
 
 export function InvestmentCancellationPolicyView(props: InvestmentCancellationPolicyViewProps) {
     const { t } = useTranslation();
-    const cancellationPolicy = props.investment.cancellationPolicy;
     
     return (
         <FormField title={t("common.investments.fields.cancellationPolicy")} className="FormField--full-width">
-            <CancellationPolicyView cancellationPolicy={cancellationPolicy} currency={props.investment.purchase.currency} />
+            <CancellationPolicyView cancellationPolicy={props.investment.cancellationPolicy} currency={props.investment.purchase.currency} />
         </FormField>
     );
 }
@@ -34,8 +33,9 @@ export interface CancellationPolicyViewProps {
 }
 
 export function CancellationPolicyView(props: CancellationPolicyViewProps) {
-    const { t } = useTranslation();
     const cancellationPolicy = props.cancellationPolicy;
+    
+    const { t } = useTranslation();
     
     return (
         <>

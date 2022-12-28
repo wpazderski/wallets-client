@@ -26,8 +26,6 @@ export function SummaryByTargetCurrencyTab(props: SummaryByTargetCurrencyTabProp
     const externalData = useAppSelector(selectExternalData);
     const userSettings = useAppSelector(selectUserSettings);
     
-    const includedWallets = props.includedWallets;
-    
     const currencyIds = useMemo(() => {
         const currencyIds = new Set();
         currencyIds.add(mainCurrencyId);
@@ -43,7 +41,7 @@ export function SummaryByTargetCurrencyTab(props: SummaryByTargetCurrencyTabProp
         return currencyIds.map(currencyId => {
             const value = investments
                 .map(investment => {
-                    if (!includedWallets.includes(investment.walletId)) {
+                    if (!props.includedWallets.includes(investment.walletId)) {
                         return 0;
                     }
                     const target = investment.targetCurrencies.find(targetCurrency => targetCurrency.id === currencyId);
@@ -62,7 +60,7 @@ export function SummaryByTargetCurrencyTab(props: SummaryByTargetCurrencyTabProp
                 value,
             };
         }).filter(entry => !!entry) as Entry[];
-    }, [investments, externalData, userSettings, includedWallets, currencyIds]);
+    }, [investments, externalData, userSettings, props.includedWallets, currencyIds]);
     
     return (
         <div className="SummaryByTargetCurrencyTab">

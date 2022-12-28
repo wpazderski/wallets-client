@@ -7,7 +7,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRowClassNameParams } from "@mui/x-data-grid";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -91,7 +91,10 @@ export function Investments() {
     const [deleteConfirmInvestmentName, setDeleteConfirmInvestmentName] = useState("");
     const [isInvestmentDeleteConfirmOpen, setIsInvestmentDeleteConfirmOpen] = useState(false);
     
-    const investmentType = investmentTypeSlug === "all" ? null : investmentTypes.find(investmentType => investmentType.slug === investmentTypeSlug);
+    const investmentType = useMemo(() => {
+        return investmentTypeSlug === "all" ? null : investmentTypes.find(investmentType => investmentType.slug === investmentTypeSlug);
+    }, [investmentTypeSlug, investmentTypes]);
+    
     const investments = useMemo(() => {
         return investmentType ? allInvestments.filter(investment => investment.type === investmentType.id) : [...allInvestments];
     }, [allInvestments, investmentType]);
@@ -156,7 +159,7 @@ export function Investments() {
         }).catch(handleLoadingError);
     }, [dispatch, api, handleLoadingError, investmentTypesLoadingState, investmentsLoadingState]);
     
-    const handleRefreshClick = () => {
+    const handleRefreshClick = useCallback(() => {
         setIsRefreshing(true);
         Promise.all([
             dispatch(loadInvestmentTypesAsync(api)),
@@ -169,7 +172,7 @@ export function Investments() {
                 }
             }
         }).catch(handleLoadingError);
-    };
+    }, [api, dispatch, handleLoadingError]);
     
     const handleViewInvestmentClick = useCallback((investmentId: InvestmentId) => {
         const investment = allInvestments.find(investment => investment.id === investmentId)!;
@@ -193,7 +196,7 @@ export function Investments() {
         setIsInvestmentDeleteConfirmOpen(true);
     }, [rows]);
     
-    const handleDeleteInvestmentConfirmClick = async () => {
+    const handleDeleteInvestmentConfirmClick = useCallback(async () => {
         const investmentId = investmentToDelete!.id;
         setIsProcessing(true);
         try {
@@ -221,21 +224,21 @@ export function Investments() {
         }
         setInvestmentToDelete(null);
         setIsInvestmentDeleteConfirmOpen(false);
-    };
+    }, [api, dispatch, investmentToDelete, t]);
     
-    const handleDeleteInvestmentCancelClick = () => {
+    const handleDeleteInvestmentCancelClick = useCallback(() => {
         setInvestmentToDelete(null);
         setIsInvestmentDeleteConfirmOpen(false);
-    };
+    }, []);
     
-    const handleDeleteInvestmentClose = () => {
+    const handleDeleteInvestmentClose = useCallback(() => {
         setInvestmentToDelete(null);
         setIsInvestmentDeleteConfirmOpen(false);
-    };
+    }, []);
     
-    const handleCreateInvestmentClick = () => {
+    const handleCreateInvestmentClick = useCallback(() => {
         navigate(getCreateInvestmentUrl(investmentTypeSlug));
-    };
+    }, [investmentTypeSlug, navigate]);
     
     const columns: GridColDef[] = useMemo(() => [
         {
@@ -301,23 +304,24 @@ export function Investments() {
                 return (
                     <>
                         {params.row.rowType === "investment" && (
-                            <>
-                                <Button variant="contained" onClick={() => handleViewInvestmentClick(params.row.id)}>
-                                    <FontAwesomeIcon icon={faSolid.faEye} />
-                                </Button>
-                                <Button variant="contained" onClick={() => handleEditInvestmentClick(params.row.id)}>
-                                    <FontAwesomeIcon icon={faSolid.faPen} />
-                                </Button>
-                                <Button variant="contained" color="warning" onClick={() => handleDeleteInvestmentClick(params.row.id)} disabled={params.row.isPredefined || params.row.numInvestments > 0}>
-                                    <FontAwesomeIcon icon={faSolid.faTrash} />
-                                </Button>
-                            </>
+                            <InvestmentRowButtons
+                                investmentId={params.row.id}
+                                isPredefined={params.row.isPredefined}
+                                numInvestments={params.row.numInvestments}
+                                onViewInvestmentClick={handleViewInvestmentClick}
+                                onEditInvestmentClick={handleEditInvestmentClick}
+                                onDeleteInvestmentClick={handleDeleteInvestmentClick}
+                            />
                         )}
                     </>
                 )
             },
         },
     ], [handleDeleteInvestmentClick, handleEditInvestmentClick, handleViewInvestmentClick, investmentTypeSlug, t]);
+    
+    const getDataGridRowClassName = useCallback((params: GridRowClassNameParams) => {
+        return params.row.rowType === "investmentType" ? "Investments__row--investmentType" : "Investments__row--investment";
+    }, []);
     
     return (
         <Page className="Investments">
@@ -340,7 +344,7 @@ export function Investments() {
                             variant="contained"
                             startIcon={<FontAwesomeIcon icon={faSolid.faPlus} />}
                             sx={{ marginBottom: 3 }}
-                            onClick={() => handleCreateInvestmentClick()}
+                            onClick={handleCreateInvestmentClick}
                         >
                             {t("page.investments.createInvestment")}
                         </Button>
@@ -348,7 +352,7 @@ export function Investments() {
                             className="Investments__refresh-button"
                             variant="text"
                             sx={{ marginBottom: 3, minWidth:0 }}
-                            onClick={() => handleRefreshClick()}
+                            onClick={handleRefreshClick}
                         >
                             <FontAwesomeIcon icon={faSolid.faRefresh} />
                         </Button>
@@ -361,12 +365,12 @@ export function Investments() {
                     rowsPerPageOptions={investmentTypeSlug === "all" ? [100] : [10, 20, 50, 100]}
                     disableSelectionOnClick
                     autoHeight={true}
-                    getRowClassName={params => params.row.rowType === "investmentType" ? "Investments__row--investmentType" : "Investments__row--investment"}
+                    getRowClassName={getDataGridRowClassName}
                 />
             </PageContent>
             <Dialog
                 open={isInvestmentDeleteConfirmOpen}
-                onClose={() => handleDeleteInvestmentClose()}
+                onClose={handleDeleteInvestmentClose}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
@@ -376,11 +380,52 @@ export function Investments() {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ margin: 3 }}>
-                    <Button variant="contained" color="warning" onClick={() => handleDeleteInvestmentConfirmClick()} autoFocus>{t("common.buttons.yes")}</Button>
-                    <Button onClick={() => handleDeleteInvestmentCancelClick()}>{t("common.buttons.no")}</Button>
+                    <Button variant="contained" color="warning" onClick={handleDeleteInvestmentConfirmClick} autoFocus>{t("common.buttons.yes")}</Button>
+                    <Button onClick={handleDeleteInvestmentCancelClick}>{t("common.buttons.no")}</Button>
                 </DialogActions>
             </Dialog>
             {(isLoading || isProcessing || isRefreshing) && <LoadingIndicator />}
         </Page>
+    );
+}
+
+interface InvestmentRowButtonsProps {
+    investmentId: InvestmentId;
+    isPredefined: boolean;
+    numInvestments: number;
+    onViewInvestmentClick: (id: InvestmentId) => void;
+    onEditInvestmentClick: (id: InvestmentId) => void;
+    onDeleteInvestmentClick: (id: InvestmentId) => void;
+}
+
+function InvestmentRowButtons(props: InvestmentRowButtonsProps) {
+    const onViewInvestmentClick = props.onViewInvestmentClick;
+    const onEditInvestmentClick = props.onEditInvestmentClick;
+    const onDeleteInvestmentClick = props.onDeleteInvestmentClick;
+    
+    const handleViewInvestmentClick = useCallback(() => {
+        onViewInvestmentClick(props.investmentId);
+    }, [onViewInvestmentClick, props.investmentId]);
+    
+    const handleEditInvestmentClick = useCallback(() => {
+        onEditInvestmentClick(props.investmentId);
+    }, [onEditInvestmentClick, props.investmentId]);
+    
+    const handleDeleteInvestmentClick = useCallback(() => {
+        onDeleteInvestmentClick(props.investmentId);
+    }, [onDeleteInvestmentClick, props.investmentId]);
+    
+    return (
+        <div>
+            <Button variant="contained" onClick={handleViewInvestmentClick}>
+                <FontAwesomeIcon icon={faSolid.faEye} />
+            </Button>
+            <Button variant="contained" onClick={handleEditInvestmentClick}>
+                <FontAwesomeIcon icon={faSolid.faPen} />
+            </Button>
+            <Button variant="contained" color="warning" onClick={handleDeleteInvestmentClick} disabled={props.isPredefined || props.numInvestments > 0}>
+                <FontAwesomeIcon icon={faSolid.faTrash} />
+            </Button>
+        </div>
     );
 }

@@ -5,10 +5,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import * as KvapiTypes from "@wpazderski/kvapi-types";
-import { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -54,18 +54,15 @@ export function UserCreate() {
     const [userRole, setUserRole] = useState<KvapiTypes.data.user.Role>("authorized");
     const [userLoginError, setUserLoginError] = useState("");
     
-    const goToUsersList = () => {
+    const goToUsersList = useCallback(() => {
         navigate(getUsersListUrl());
-    };
+    }, [navigate]);
     
-    const handleUserRoleChange = (role: KvapiTypes.data.user.Role) => {
-        setUserRole(role);
-    };
+    const handleUserRoleChange = useCallback((event: SelectChangeEvent<KvapiTypes.data.user.Role>) => {
+        setUserRole(event.target.value as KvapiTypes.data.user.Role);
+    }, []);
     
-    const handleUserLoginChange = (login: KvapiTypes.data.user.Login) => {
-        setUserLogin(login);
-    };
-    const validateUserLogin = () => {
+    const validateUserLogin = useCallback(() => {
         if (userLogin.trim().length === 0) {
             setUserLoginError(t("page.userCreate.form.errors.loginRequired"));
             return false;
@@ -74,13 +71,24 @@ export function UserCreate() {
             setUserLoginError("");
             return true;
         }
-    };
-    const handleUserLoginBlur = (login: KvapiTypes.data.user.Login) => {
-        setUserLogin(login.trim() as KvapiTypes.data.user.Login);
-        validateUserLogin();
-    };
+    }, [t, userLogin]);
     
-    const handleSaveChangesClick = async () => {
+    const handleUserLoginChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setUserLogin(event.target.value as KvapiTypes.data.user.Login);
+    }, []);
+    
+    const handleUserLoginBlur = useCallback((event: React.FocusEvent<HTMLInputElement>) => {
+        setUserLogin(event.target.value.trim() as KvapiTypes.data.user.Login);
+        validateUserLogin();
+    }, [validateUserLogin]);
+    
+    const validateForm = useCallback(() => {
+        let isOk: boolean = true;
+        isOk = validateUserLogin() && isOk;
+        return isOk;
+    }, [validateUserLogin]);
+    
+    const handleSaveChangesClick = useCallback(async () => {
         if (!validateForm()) {
             return;
         }
@@ -109,17 +117,11 @@ export function UserCreate() {
         finally {
             setIsProcessing(false);
         }
-    };
+    }, [api, dispatch, goToUsersList, t, userLogin, userPassword, userRole, validateForm]);
     
-    const handleCancelClick = () => {
+    const handleCancelClick = useCallback(() => {
         goToUsersList();
-    };
-    
-    const validateForm = () => {
-        let isOk: boolean = true;
-        isOk = validateUserLogin() && isOk;
-        return isOk;
-    };
+    }, [goToUsersList]);
     
     return (
         <Page className="UserCreate">
@@ -130,8 +132,8 @@ export function UserCreate() {
                         <FormControl>
                             <TextField
                                 value={userLogin}
-                                onChange={event => handleUserLoginChange(event.target.value as KvapiTypes.data.user.Login)}
-                                onBlur={event => handleUserLoginBlur(event.target.value as KvapiTypes.data.user.Login)}
+                                onChange={handleUserLoginChange}
+                                onBlur={handleUserLoginBlur}
                                 error={!!userLoginError}
                                 helperText={userLoginError || " "}
                             />
@@ -146,7 +148,7 @@ export function UserCreate() {
                         <FormControl>
                             <Select
                                 value={userRole}
-                                onChange={event => handleUserRoleChange(event.target.value as KvapiTypes.data.user.Role)}
+                                onChange={handleUserRoleChange}
                             >
                                 {getAvailableUserRoles().map(userRole => <MenuItem key={userRole} value={userRole}>{t(`page.userCreate.form.role.list.${userRole}`)}</MenuItem>)}
                             </Select>
@@ -157,13 +159,13 @@ export function UserCreate() {
                         <Button
                             variant="contained"
                             startIcon={<FontAwesomeIcon icon={faSolid.faSave} />}
-                            onClick={() => handleSaveChangesClick()}
+                            onClick={handleSaveChangesClick}
                         >
                             {t("common.buttons.save")}
                         </Button>
                         <Button
                             variant="outlined"
-                            onClick={() => handleCancelClick()}
+                            onClick={handleCancelClick}
                         >
                             {t("common.buttons.cancel")}
                         </Button>
