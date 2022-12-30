@@ -4,6 +4,7 @@ import * as faSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 import { resolveServerError, UserSessionManager } from "../../../../app";
 import { useApiContext } from "../../../../app/ApiContext";
@@ -22,6 +23,7 @@ export function AppSidebar() {
     const { t } = useTranslation();
     const api = useApiContext();
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const appHasAnyUsers = useAppSelector(selectHasAnyUsers);
     const userRole = useAppSelector(userSlice.selectUserRole);
     const userLastPasswordUpdateTimestamp = useAppSelector(userSlice.selectUserLastPasswordUpdateTimestamp);
@@ -33,6 +35,7 @@ export function AppSidebar() {
         setIsProcessing(true);
         try {
             await UserSessionManager.signOut(api);
+            navigate("/");
         }
         catch (err) {
             console.error(err);
@@ -44,7 +47,7 @@ export function AppSidebar() {
             }));
         }
         setIsProcessing(false);
-    }, [api, dispatch, t]);
+    }, [api, dispatch, navigate, t]);
     
     return (
         <div className="AppSidebar">

@@ -30,6 +30,7 @@ export function SidebarNavLink({ children, to, matchWholePath, ...props }: Sideb
         <div>
             <Link
                 to={to}
+                data-testid={`SidebarNavLink:${to}`}
                 {...props}
                 onClick={handleClick}
                 className={`SidebarNavLink ${pathMatch ? "SidebarNavLink--active" : "SidebarNavLink--inactive"}`}

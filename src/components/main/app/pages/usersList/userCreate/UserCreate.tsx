@@ -136,11 +136,12 @@ export function UserCreate() {
                                 onBlur={handleUserLoginBlur}
                                 error={!!userLoginError}
                                 helperText={userLoginError || " "}
+                                data-testid="UserCreate__login"
                             />
                         </FormControl>
                     </FormField>
                     <FormField title={t("page.userCreate.form.password.name")} description={t("page.userCreate.form.password.description")}>
-                        <FormControl>
+                        <FormControl data-testid="UserCreate__password">
                             {userPassword}
                         </FormControl>
                     </FormField>
@@ -160,6 +161,7 @@ export function UserCreate() {
                             variant="contained"
                             startIcon={<FontAwesomeIcon icon={faSolid.faSave} />}
                             onClick={handleSaveChangesClick}
+                            data-testid="UserCreate__submit"
                         >
                             {t("common.buttons.save")}
                         </Button>

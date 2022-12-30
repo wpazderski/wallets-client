@@ -256,7 +256,7 @@ export function Investments() {
                             </Link>
                         }
                         {params.row.rowType === "investment" &&
-                            <Link to={getViewInvestmentUrl(params.row.type, params.row.id)}>
+                            <Link to={getViewInvestmentUrl(params.row.type, params.row.id)} data-testid="Investments__row__name" data-investment-id={params.row.id} data-investment-name={params.value}>
                                 {params.value}
                             </Link>
                         }
@@ -274,9 +274,9 @@ export function Investments() {
             align: "right",
             renderCell: params => {
                 return (
-                    <>
+                    <span data-testid="Investments__row__current-value" data-investment-id={params.row.id} data-investment-current-value={params.value}>
                         {params.row.rowType === "investment" && <NumberView num={params.value} currency={params.row.purchase.currency} />}
-                    </>
+                    </span>
                 );
             },
         },
@@ -345,6 +345,7 @@ export function Investments() {
                             startIcon={<FontAwesomeIcon icon={faSolid.faPlus} />}
                             sx={{ marginBottom: 3 }}
                             onClick={handleCreateInvestmentClick}
+                            data-testid="Investments__add"
                         >
                             {t("page.investments.createInvestment")}
                         </Button>
@@ -380,7 +381,7 @@ export function Investments() {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ margin: 3 }}>
-                    <Button variant="contained" color="warning" onClick={handleDeleteInvestmentConfirmClick} autoFocus>{t("common.buttons.yes")}</Button>
+                    <Button variant="contained" color="warning" onClick={handleDeleteInvestmentConfirmClick} autoFocus data-testid="Investments__delete-dialog__yes">{t("common.buttons.yes")}</Button>
                     <Button onClick={handleDeleteInvestmentCancelClick}>{t("common.buttons.no")}</Button>
                 </DialogActions>
             </Dialog>
@@ -420,10 +421,10 @@ function InvestmentRowButtons(props: InvestmentRowButtonsProps) {
             <Button variant="contained" onClick={handleViewInvestmentClick}>
                 <FontAwesomeIcon icon={faSolid.faEye} />
             </Button>
-            <Button variant="contained" onClick={handleEditInvestmentClick}>
+            <Button variant="contained" onClick={handleEditInvestmentClick} data-testid="Investments__edit" data-investment-id={props.investmentId}>
                 <FontAwesomeIcon icon={faSolid.faPen} />
             </Button>
-            <Button variant="contained" color="warning" onClick={handleDeleteInvestmentClick} disabled={props.isPredefined || props.numInvestments > 0}>
+            <Button variant="contained" color="warning" onClick={handleDeleteInvestmentClick} disabled={props.isPredefined || props.numInvestments > 0} data-testid="Investments__delete" data-investment-id={props.investmentId}>
                 <FontAwesomeIcon icon={faSolid.faTrash} />
             </Button>
         </div>

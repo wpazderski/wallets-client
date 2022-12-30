@@ -98,14 +98,14 @@ export function SignIn() {
             <PageContent>
                 <Form onSubmit={handleSubmit}>
                     <FormField title={t("page.signIn.form.login")}>
-                        <TextField type="text" value={userLogin} onChange={handleUserLoginChange} error={!!userLoginError} helperText={userLoginError || " "} />
+                        <TextField type="text" value={userLogin} onChange={handleUserLoginChange} error={!!userLoginError} helperText={userLoginError || " "} data-testid="SignIn__login" />
                     </FormField>
                     <FormField title={t("page.signIn.form.password")}>
-                        <TextField type="password" value={userPassword} onChange={handleUserPasswordChange} error={!!userPasswordError} helperText={userPasswordError || " "} />
+                        <TextField type="password" value={userPassword} onChange={handleUserPasswordChange} error={!!userPasswordError} helperText={userPasswordError || " "} data-testid="SignIn__password" />
                     </FormField>
                     <FormSeparator />
                     <FormField type="buttons">
-                        <Button type="submit" variant="contained" disabled={isProcessing}>{t("page.signIn.form.buttons.signIn")}</Button>
+                        <Button type="submit" variant="contained" disabled={isProcessing} data-testid="SignIn__submit">{t("page.signIn.form.buttons.signIn")}</Button>
                     </FormField>
                 </Form>
                 {isProcessing && <LoadingIndicator />}

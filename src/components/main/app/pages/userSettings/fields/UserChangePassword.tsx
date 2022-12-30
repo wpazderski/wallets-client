@@ -101,6 +101,7 @@ export function UserChangePassword(props: UserChangePasswordProps) {
                     value={currentPassword}
                     onChange={handleCurrentPasswordChange}
                     error={!!currentPasswordError} helperText={currentPasswordError || " "}
+                    data-testid="UserSettings__ChangePassword__current-password"
                 />
             </FormField>
             <FormField className="UserSettings__ChangePassword__new-password" title={t("page.userSettings.form.changePassword.password.name")}>
@@ -110,6 +111,7 @@ export function UserChangePassword(props: UserChangePasswordProps) {
                     onChange={handleNewPasswordChange}
                     error={!!newPasswordError}
                     helperText={newPasswordError || " "}
+                    data-testid="UserSettings__ChangePassword__new-password"
                 />
             </FormField>
             <FormField className="UserSettings__ChangePassword__new-password-repeated" title={t("page.userSettings.form.changePassword.passwordRepeated.name")}>
@@ -119,10 +121,11 @@ export function UserChangePassword(props: UserChangePasswordProps) {
                     onChange={handleNewPasswordRepeatedChange}
                     error={!!newPasswordRepeatedError}
                     helperText={newPasswordRepeatedError || " "}
+                    data-testid="UserSettings__ChangePassword__new-password-repeated"
                 />
             </FormField>
             <FormField type="buttons">
-                <Button variant="contained" onClick={handleChangePasswordClick} disabled={!canFormBeSubmitted} startIcon={<FontAwesomeIcon icon={faSolid.faKey} />}>
+                <Button variant="contained" onClick={handleChangePasswordClick} disabled={!canFormBeSubmitted} startIcon={<FontAwesomeIcon icon={faSolid.faKey} data-testid="UserSettings__ChangePassword__submit" />}>
                     {t("page.userSettings.form.changePassword.button")}
                 </Button>
             </FormField>

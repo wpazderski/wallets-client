@@ -173,6 +173,7 @@ export function InvestmentPurchaseField(props: InvestmentPurchaseFieldProps) {
                             allowNegative={false}
                             value={amountOfMoney}
                             onValueChange={handleAmountOfMoneyChange}
+                            data-testid="Investments__add__purchase-price"
                         />
                     </FormControl>
                 </>

@@ -69,6 +69,7 @@ export function InvestmentNameField(props: InvestmentNameFieldProps) {
                 onBlur={handleFieldBlur}
                 error={!!fieldError}
                 helperText={fieldError || " "}
+                data-testid="Investments__add__name"
             />
         </FormField>
     );

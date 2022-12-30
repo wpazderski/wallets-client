@@ -343,7 +343,7 @@ export function InvestmentForm() {
                                 />}
                                 <FormSeparator />
                                 <FormField type="buttons">
-                                    <Button variant="contained" startIcon={<FontAwesomeIcon icon={faSolid.faSave} />} onClick={handleSaveClick}>
+                                    <Button variant="contained" startIcon={<FontAwesomeIcon icon={faSolid.faSave} />} onClick={handleSaveClick} data-testid="Investments__add__save">
                                         {t("common.buttons.save")}
                                     </Button>
                                 </FormField>

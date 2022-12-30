@@ -256,7 +256,7 @@ export function Wallets() {
             valueGetter: (params: GridValueGetterParams) => params.row.isPredefined ? t(params.value as any) : params.value,
             renderCell: params => {
                 return (
-                    <Link to={getViewWalletUrl(params.row.id)}>
+                    <Link to={getViewWalletUrl(params.row.id)} data-testid="Wallets__row__name" data-wallet-id={params.row.id} data-wallet-name={params.value}>
                         {params.value}
                     </Link>
                 );
@@ -267,6 +267,13 @@ export function Wallets() {
             headerName: t("page.wallets.table.description"),
             flex: 2,
             valueGetter: (params: GridValueGetterParams) => params.row.isPredefined ? t(params.value as any) : params.value,
+            renderCell: params => {
+                return (
+                    <span data-testid="Wallets__row__description" data-wallet-id={params.row.id} data-wallet-description={params.value}>
+                        {params.value}
+                    </span>
+                );
+            },
         },
         {
             field: "numInvestments",
@@ -308,6 +315,7 @@ export function Wallets() {
                     startIcon={<FontAwesomeIcon icon={faSolid.faFolderPlus} />}
                     sx={{ marginBottom: 3 }}
                     onClick={handleCreateWalletClick}
+                    data-testid="Wallets__add"
                 >
                     {t("page.wallets.createWallet")}
                 </Button>
@@ -332,7 +340,7 @@ export function Wallets() {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ margin: 3 }}>
-                    <Button variant="contained" color="warning" onClick={handleDeleteWalletConfirmClick} autoFocus>{t("common.buttons.yes")}</Button>
+                    <Button variant="contained" color="warning" onClick={handleDeleteWalletConfirmClick} autoFocus data-testid="Wallets__delete-dialog__yes">{t("common.buttons.yes")}</Button>
                     <Button onClick={handleDeleteWalletCancelClick}>{t("common.buttons.no")}</Button>
                 </DialogActions>
             </Dialog>
@@ -347,9 +355,9 @@ export function Wallets() {
                         variant="standard"
                         onChange={handleChangeName}
                         value={formWalletName}
+                        data-testid="Wallets__add__name"
                     />
                     <TextField
-                        autoFocus
                         margin="dense"
                         label={t("page.wallets.form.description")}
                         multiline
@@ -358,10 +366,11 @@ export function Wallets() {
                         rows={4}
                         onChange={handleChangeDescription}
                         value={formWalletDescription}
+                        data-testid="Wallets__add__description"
                     />
                 </DialogContent>
                 <DialogActions sx={{ margin: 3 }}>
-                    <Button onClick={handleSaveFormClick} variant="contained">{t("page.wallets.form.buttons.save")}</Button>
+                    <Button onClick={handleSaveFormClick} variant="contained" data-testid="Wallets__add__save">{t("page.wallets.form.buttons.save")}</Button>
                     <Button onClick={handleCancelFormClick}>{t("page.wallets.form.buttons.cancel")}</Button>
                 </DialogActions>
             </Dialog>
@@ -392,10 +401,10 @@ function WalletRowButtons(props: WalletRowButtonsProps) {
     
     return (
         <div>
-            <Button variant="contained" onClick={handleEditWalletClick} disabled={props.isPredefined}>
+            <Button variant="contained" onClick={handleEditWalletClick} disabled={props.isPredefined} data-testid="Wallets__edit" data-wallet-id={props.walletId}>
                 <FontAwesomeIcon icon={faSolid.faPen} />
             </Button>
-            <Button variant="contained" color="warning" onClick={handleDeleteWalletClick} disabled={props.isPredefined || props.numInvestments > 0}>
+            <Button variant="contained" color="warning" onClick={handleDeleteWalletClick} disabled={props.isPredefined || props.numInvestments > 0} data-testid="Wallets__delete" data-wallet-id={props.walletId}>
                 <FontAwesomeIcon icon={faSolid.faTrash} />
             </Button>
         </div>

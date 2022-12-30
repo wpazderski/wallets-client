@@ -354,6 +354,7 @@ export function InvestmentTypeForm() {
                                             onBlur={handleNameBlur}
                                             error={!!nameError}
                                             helperText={nameError || " "}
+                                            data-testid="InvestmentTypes__add__name"
                                         />
                                     }
                                     {!canChangeParams && (isPredefined ? t(`common.investmentTypes.${investmentTypeName}` as any) : investmentTypeName)}
@@ -446,7 +447,7 @@ export function InvestmentTypeForm() {
                                 </FormField>
                                 <FormSeparator />
                                 <FormField type="buttons">
-                                    <Button variant="contained" startIcon={<FontAwesomeIcon icon={faSolid.faSave} />} onClick={handleSaveClick}>
+                                    <Button variant="contained" startIcon={<FontAwesomeIcon icon={faSolid.faSave} />} onClick={handleSaveClick} data-testid="InvestmentTypes__add__save">
                                         {t("common.buttons.save")}
                                     </Button>
                                 </FormField>

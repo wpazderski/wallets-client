@@ -163,6 +163,7 @@ export function UserEdit() {
                                     onBlur={handleUserLoginBlur}
                                     error={!!userLoginError}
                                     helperText={userLoginError || " "}
+                                    data-testid="UserEdit__login"
                                 />
                             </FormControl>
                         </FormField>
@@ -183,6 +184,7 @@ export function UserEdit() {
                                 variant="contained"
                                 startIcon={<FontAwesomeIcon icon={faSolid.faSave} />}
                                 onClick={handleSaveChangesClick}
+                                data-testid="UserEdit__submit"
                             >
                                 {t("common.buttons.save")}
                             </Button>

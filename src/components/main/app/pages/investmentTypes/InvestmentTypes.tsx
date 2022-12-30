@@ -194,7 +194,7 @@ export function InvestmentTypes() {
             valueGetter: (params: GridValueGetterParams) => params.row.isPredefined ? t(`common.investmentTypes.${params.row.name}` as any) : params.row.name,
             renderCell: params => {
                 return (
-                    <Link to={getViewInvestmentTypeUrl(params.row.id)}>
+                    <Link to={getViewInvestmentTypeUrl(params.row.id)} data-testid="InvestmentTypes__row__name" data-investment-type-id={params.row.id} data-investment-type-name={params.value} data-investment-type-slug={params.row.slug}>
                         <FontAwesomeIcon icon={params.row.icon} fixedWidth />
                         <span style={{ marginLeft: "10px" }}>{params.value}</span>
                     </Link>
@@ -238,6 +238,7 @@ export function InvestmentTypes() {
                     startIcon={<FontAwesomeIcon icon={faSolid.faFolderPlus} />}
                     sx={{ marginBottom: 3 }}
                     onClick={handleCreateInvestmentTypeClick}
+                    data-testid="InvestmentTypes__add"
                 >
                     {t("page.investmentTypes.createInvestmentType")}
                 </Button>
@@ -270,7 +271,7 @@ export function InvestmentTypes() {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ margin: 3 }}>
-                    <Button variant="contained" color="warning" onClick={handleDeleteInvestmentTypeConfirmClick} autoFocus>{t("common.buttons.yes")}</Button>
+                    <Button variant="contained" color="warning" onClick={handleDeleteInvestmentTypeConfirmClick} autoFocus data-testid="InvestmentTypes__delete-dialog__yes">{t("common.buttons.yes")}</Button>
                     <Button onClick={handleDeleteInvestmentTypeCancelClick}>{t("common.buttons.no")}</Button>
                 </DialogActions>
             </Dialog>
@@ -310,10 +311,10 @@ function InvestmentTypeRowButtons(props: InvestmentTypeRowButtonsProps) {
             <Button variant="contained" onClick={handleViewInvestmentTypeClick}>
                 <FontAwesomeIcon icon={faSolid.faEye} />
             </Button>
-            <Button variant="contained" onClick={handleEditInvestmentTypeClick}>
+            <Button variant="contained" onClick={handleEditInvestmentTypeClick} data-testid="InvestmentTypes__edit" data-investment-type-id={props.investmentTypeId}>
                 <FontAwesomeIcon icon={faSolid.faPen} />
             </Button>
-            <Button variant="contained" color="warning" onClick={handleDeleteInvestmentTypeClick} disabled={props.isPredefined || props.numInvestments > 0}>
+            <Button variant="contained" color="warning" onClick={handleDeleteInvestmentTypeClick} disabled={props.isPredefined || props.numInvestments > 0} data-testid="InvestmentTypes__delete" data-investment-type-id={props.investmentTypeId}>
                 <FontAwesomeIcon icon={faSolid.faTrash} />
             </Button>
         </div>

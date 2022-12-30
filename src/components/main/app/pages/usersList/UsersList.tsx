@@ -143,6 +143,11 @@ export function UsersList() {
             field: "login",
             headerName: t("page.usersList.table.login"),
             flex: 1,
+            renderCell: params => {
+                return (
+                    <span data-testid="UsersList__row__login" data-user-id={params.row.id} data-user-login={params.value}>{params.value}</span>
+                );
+            },
         },
         {
             field: "role",
@@ -162,7 +167,7 @@ export function UsersList() {
                         onEditUserClick={handleEditUserClick}
                         onDeleteUserClick={handleDeleteUserClick}
                     />
-                )
+                );
             },
         },
     ], [handleDeleteUserClick, handleEditUserClick, signedInUserId, t]);
@@ -178,6 +183,7 @@ export function UsersList() {
                             startIcon={<FontAwesomeIcon icon={faSolid.faUserPlus} />}
                             sx={{ marginBottom: 3 }}
                             onClick={handleCreateUserClick}
+                            data-testid="UsersList__add"
                         >
                             {t("page.usersList.createUser")}
                         </Button>
@@ -189,14 +195,17 @@ export function UsersList() {
                         >
                             <FontAwesomeIcon icon={faSolid.faRefresh} />
                         </Button>
-                        <DataGrid
-                            rows={rows}
-                            columns={columns}
-                            pageSize={50}
-                            rowsPerPageOptions={[10, 20, 50, 100, 1000]}
-                            disableSelectionOnClick
-                            autoHeight={true}
-                        />
+                        <div data-testid="UsersList__table">
+                            <DataGrid
+                                rows={rows}
+                                columns={columns}
+                                pageSize={50}
+                                rowsPerPageOptions={[10, 20, 50, 100, 1000]}
+                                disableSelectionOnClick
+                                autoHeight={true}
+                                
+                            />
+                        </div>
                     </>
                 )}
             </PageContent>
@@ -212,8 +221,8 @@ export function UsersList() {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ margin: 3 }}>
-                    <Button variant="contained" color="warning" onClick={handleDeleteUserConfirmClick} autoFocus>{t("common.buttons.yes")}</Button>
-                    <Button onClick={handleDeleteUserCancelClick}>{t("common.buttons.no")}</Button>
+                    <Button variant="contained" color="warning" onClick={handleDeleteUserConfirmClick} autoFocus data-testid="UsersList__delete-dialog__yes">{t("common.buttons.yes")}</Button>
+                    <Button onClick={handleDeleteUserCancelClick} data-testid="UsersList__delete-dialog__no">{t("common.buttons.no")}</Button>
                 </DialogActions>
             </Dialog>
             {(isLoading || isProcessing || isRefreshing) && <LoadingIndicator />}
@@ -242,10 +251,10 @@ function UserRowButtons(props: UserRowButtonsProps) {
     
     return (
         <div>
-            <Button variant="contained" onClick={handleEditUserClick}>
+            <Button variant="contained" onClick={handleEditUserClick} data-testid="UsersList__edit" data-user-id={props.userId}>
                 <FontAwesomeIcon icon={faSolid.faPen} />
             </Button>
-            <Button variant="contained" color="warning" onClick={handleDeleteUserClick} disabled={props.isCurrentUser}>
+            <Button variant="contained" color="warning" onClick={handleDeleteUserClick} disabled={props.isCurrentUser} data-testid="UsersList__delete" data-user-id={props.userId}>
                 <FontAwesomeIcon icon={faSolid.faTrash} />
             </Button>
         </div>
